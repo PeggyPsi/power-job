@@ -2,14 +2,17 @@ import { boolean, index, integer, pgEnum, pgTable, text, timestamp, varchar } fr
 import { createdAt, id, updatedAt } from "../schemaHelpers";
 import { OrganizationTable } from "./organization";
 
+// DEVNOTE: `number` on typeof references means "any index of the array".
+// So this gives us the type of any item in the array
+
 // Wage Intervals
 export const wageIntervals = ["hourly", "yearly"] as const;
-export type WageInterval = typeof wageIntervals[number];
+export type WageInterval = (typeof wageIntervals)[number];
 export const wageIntervalEnum = pgEnum("job_listing_wage_interval", wageIntervals); // enum representation in DB
 
 // Location Requirements
 export const locationRequirements = ["in-office", "hybrid", "remote"] as const;
-export type LocationRequirement = typeof locationRequirements[number];
+export type LocationRequirement = (typeof locationRequirements)[number];
 export const locationRequirementEnum = pgEnum("job_listing_location_requirement", locationRequirements); // enum representation in DB
 
 // Experience Levels
