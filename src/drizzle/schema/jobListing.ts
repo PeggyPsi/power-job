@@ -1,6 +1,8 @@
 import { boolean, index, integer, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "../schemaHelpers";
 import { OrganizationTable } from "./organization";
+import { relations } from "drizzle-orm";
+import { JobListingApplicationTable } from "./jobListingApplication";
 
 // DEVNOTE: `number` on typeof references means "any index of the array".
 // So this gives us the type of any item in the array
@@ -52,4 +54,17 @@ export const JobListingTable = pgTable("job_listings", {
 	updatedAt,
 },
 	table => [index().on(table.stateAbbreviation)]
+)
+
+export const jobListingReferences = relations(
+	JobListingTable,
+	({ one, many }) => ({
+		// This one references the organization entity and the relation between jobListing and organization
+		// This is helpful so that we can easily query listing and their related info later on
+		organization: one(OrganizationTable, {
+			fields: [JobListingTable.organizationId], // basically it says that the field organizationId
+			references: [OrganizationTable.id] // references the id column in OrganizationTable
+		}),
+		applications: many(JobListingApplicationTable)
+	})
 )

@@ -1,6 +1,7 @@
-import { boolean, pgTable, varchar } from "drizzle-orm/pg-core";
+import { pgTable, varchar } from "drizzle-orm/pg-core";
 import { UserTable } from "./user";
 import { createdAt, updatedAt } from "../schemaHelpers";
+import { relations } from "drizzle-orm";
 
 // many to many relation
 export const UserResumeTable = pgTable("user_resumes", {
@@ -11,3 +12,13 @@ export const UserResumeTable = pgTable("user_resumes", {
 	createdAt,
 	updatedAt
 })
+
+export const UserResumeReferences = relations(
+	UserResumeTable,
+	({ one }) => ({
+		user: one(UserTable, {
+			fields: [UserResumeTable.userId],
+			references: [UserTable.id]
+		})
+	})
+)

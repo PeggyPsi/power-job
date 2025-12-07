@@ -8,4 +8,7 @@ export default defineConfig({
 	dbCredentials: {
 		url: env.DATABASE_URL,
 	},
+	migrations: {
+		schema: "public" // Set the db schema name to "public". By default is is set as "drizlle"
+	}
 })

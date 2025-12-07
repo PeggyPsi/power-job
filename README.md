@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+docker-compose up build # to run all the appropriate containers related to the application
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Db Migration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To initialize the database you need to create and run a migration file of the DB schema.
+Run the following commands to generate it and apply it.
 
-## Learn More
+!IMPORTANT: make sure that postgresql is up and running. You have to run `docker-compose up build` to run it
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# make sure to run the following commands from the root folder
+chmod +x ./src/drizzle/generate-migration.js # make the generator js file executable
+npm run db:generate <migration_name> # creates a timestamped migration file inside ./src/drizzle/migrations. See drizzle-config.ts "out" param for more information
+npm run db:migrate # apply latest pending migrations
+npm run db:studio # (optional) open drizzle studio in a UI interface to checkout the DB
+```
