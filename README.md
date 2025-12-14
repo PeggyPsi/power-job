@@ -33,3 +33,16 @@ The project uses [shadcn](https://ui.shadcn.com/docs/components/sidebar) library
 # Icons
 
 Use of [Lucide](https://lucide.dev/) library.
+
+# Inngest
+
+The project uses Inngest to ...
+To run the Inngest server run the following command
+
+```bash
+npm install -g inngest-cli # to globally instal the inngest-cli
+npm run inngest
+```
+
+Ingest local dev server runs on http://localhost:8288/
+For the cloud server go to https://app.inngest.com/env/production/apps
