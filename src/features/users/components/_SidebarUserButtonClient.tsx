@@ -4,11 +4,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SidebarMenuButton } from "@/components/ui/sidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { ChevronsUpDown } from "lucide-react";
+import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
+import { SignOutButton, useClerk } from "@clerk/nextjs";
+import {
+  ChevronsUpDown,
+  LogOutIcon,
+  SettingsIcon,
+  UserIcon,
+} from "lucide-react";
+import Link from "next/link";
 
 interface ISidebarUserButtonClientProps {
   user: ISidebarUserInfo;
@@ -23,7 +32,8 @@ interface ISidebarUserInfo {
 export default function SidebarUserButtonClient(
   props: ISidebarUserButtonClientProps
 ) {
-  const { isMobile } = useIsMobile();
+  const { isMobile, setOpenMobile } = useSidebar();
+  const { openUserProfile } = useClerk();
 
   return (
     <DropdownMenu>
@@ -38,7 +48,36 @@ export default function SidebarUserButtonClient(
           <ChevronsUpDown className="ml-auto group-data-[state=collapsed]:hidden" />
         </SidebarMenuButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>Aasdasd</DropdownMenuContent>
+      <DropdownMenuContent
+        sideOffset={4}
+        align="end"
+        side={isMobile ? "bottom" : "right"}
+        className="min-w-64 max-w-80"
+      >
+        <DropdownMenuLabel className="font-normal p-1">
+          <UserInfo {...props.user} />
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            openUserProfile();
+            setOpenMobile(false); // so that when in mobile, when profile is opened, sidebar closes
+          }}
+        >
+          <UserIcon className="mr-1" /> Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/user-settings/notifications">
+            <SettingsIcon className="mr-1" /> Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <SignOutButton>
+          <DropdownMenuItem>
+            <LogOutIcon className="mr-1" /> Sign out
+          </DropdownMenuItem>
+        </SignOutButton>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 }
