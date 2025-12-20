@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/db";
-import { UserTable } from "@/drizzle/schema";
+import { User, UserTable } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 
 export const userRepository = {
@@ -17,4 +17,7 @@ export const userRepository = {
 	delete: async (userId: string) => {
 		await db.delete(UserTable).where(eq(UserTable.id, userId));
 	},
+	getById: async (userId: string): Promise<User> => {
+		return await db.select().from(UserTable).where(eq(UserTable.id, userId)).limit(1).then(res => res[0]);
+	}
 };

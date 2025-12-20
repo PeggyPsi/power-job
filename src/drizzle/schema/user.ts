@@ -6,6 +6,15 @@ import { OrganizationUserSettingsTable } from "./organizationUserSettings";
 import { UserNotificationSettingsTable } from "./userNotificationSettings";
 import { UserResumeTable } from "./userResume";
 
+export type User = {
+	id: string;
+	email: string;
+	name: string;
+	imageUrl: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 export const UserTable = pgTable("users", {
 	id: varchar().primaryKey(),
 	name: varchar().notNull(),
