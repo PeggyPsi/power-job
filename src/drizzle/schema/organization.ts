@@ -4,6 +4,14 @@ import { relations } from "drizzle-orm";
 import { JobListingTable } from "./jobListing";
 import { OrganizationUserSettingsTable } from "./organizationUserSettings";
 
+export type Organization = {
+	id: string;
+	name: string;
+	imageUrl: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 export const OrganizationTable = pgTable("organizations", {
 	id: varchar().primaryKey(),
 	name: varchar().notNull(),
