@@ -4,12 +4,14 @@ import { Webhook } from "svix";
 import { NonRetriableError } from "inngest";
 import { userRepository } from "@/features/users/db/users.repository";
 import { userNotificationSettingsRepository } from "@/features/users/db/userNotificationSettings.repository";
+import { organizationsRepository } from "@/features/organizations/db/organizations.repository";
 
 // Helper method to verify Clerk webhooks
 function verifyWebhook({ raw, headers }: { raw: string, headers: Record<string, string> }) {
 	return new Webhook(env.CLERK_WEBHOOK_SECRET).verify(raw, headers);
 }
 
+// Users
 export const clerkCreateUser = inngest.createFunction({
 	id: "clerk/create-user",
 	name: "Clerk - Create DB User"
@@ -113,6 +115,41 @@ export const clerkDeleteUser = inngest.createFunction({
 				throw new NonRetriableError("No user id found to delete");
 			}
 			await userRepository.delete(userIdToDelete);
+		})
+	}
+);
+
+// Organizations
+export const clerkCreateOrganization = inngest.createFunction({
+	id: "clerk/create-organization",
+	name: "Clerk - Create DB Organization"
+},
+	{
+		event: 'clerk/organization.created'
+	},
+	async ({ event, step }) => {
+		// First step is to try andv verify the webhook
+		await step.run("verify-webhook", async () => {
+			try {
+				verifyWebhook(event.data); // sanity check
+			} catch (error) {
+				throw new NonRetriableError("Invalid webhook for function clerk/create-organization")
+			}
+		})
+
+		// Create actual organization
+		await step.run("create-organization", async () => {
+			const organizationData = event.data.data;
+
+			await organizationsRepository.insert({
+				id: organizationData.id,
+				name: organizationData.name,
+				imageUrl: organizationData.image_url,
+				createdAt: new Date(organizationData.created_at),
+				updatedAt: new Date(organizationData.updated_at)
+			})
+
+			return organizationData.id;
 		})
 	}
 );

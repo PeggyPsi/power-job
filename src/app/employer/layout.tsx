@@ -9,15 +9,23 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import SidebarOrganizationBtn from "@/features/organizations/components/SidebarOrganizationBtn";
-import SidebarUserBtn from "@/features/users/components/SidebarUserBtn";
-import { ClipboardListIcon, LogInIcon, PlusIcon } from "lucide-react";
+import { ClipboardListIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default function EmployerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <Suspense>
+      <LayoutSuspense>{children}</LayoutSuspense>
+    </Suspense>
+  );
+}
+
+async function LayoutSuspense({ children }: { children: React.ReactNode }) {
   const menuItems: Array<SidebarNavMenuGroupItem> = [
     {
       href: "/",

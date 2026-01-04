@@ -1,17 +1,18 @@
 import { db } from "@/drizzle/db";
-import { Organization, User, UserTable } from "@/drizzle/schema";
+import { Organization, OrganizationTable, User, UserTable } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { revalidateOrganizationCache } from "./cache/organizations";
 
 export const organizationsRepository = {
-	// insert: async (user: typeof UserTable.$inferInsert) => {
-	// 	await db.insert(UserTable).values(user)
-	// 		// If user already exists, we do an upsett (update existing record)
-	// 		.onConflictDoUpdate({
-	// 			target: UserTable.id,
-	// 			set: user
-	// 		});
-
+	insert: async (organization: typeof OrganizationTable.$inferInsert) => {
+		console.log("Inserting Organization: ", organization)
+		await db.insert(OrganizationTable).values(organization)
+			// If organization already exists, we do an upsett (update existing record)
+			.onConflictDoUpdate({
+				target: OrganizationTable.id,
+				set: organization
+			});
+	},
 	// 	revalidateOrganizationCache(user.id); // always revalidate cache after CRUD operations
 	// },
 	// update: async (userId: string, user: Partial<typeof UserTable.$inferInsert>) => {

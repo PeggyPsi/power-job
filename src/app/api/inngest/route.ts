@@ -1,6 +1,6 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/services/inngest/client";
-import { clerkCreateUser, clerkDeleteUser, clerkUpdateUser } from "@/services/inngest/functions/clerk.inngest";
+import { clerkCreateOrganization, clerkCreateUser, clerkDeleteUser, clerkUpdateUser } from "@/services/inngest/functions/clerk.inngest";
 
 // Inngest API route handler. We define the functions that we want to expose via this route
 export const { GET, POST, PUT } = serve({
@@ -8,6 +8,7 @@ export const { GET, POST, PUT } = serve({
 	functions: [
 		clerkCreateUser,
 		clerkUpdateUser,
-		clerkDeleteUser
+		clerkDeleteUser,
+		clerkCreateOrganization
 	],
 });
