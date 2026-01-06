@@ -2,6 +2,7 @@ import { db } from "@/drizzle/db";
 import { User, UserTable } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { revalidateUserCache } from "./cache/users";
+import { userNotificationSettingsRepository } from "./userNotificationSettings.repository";
 
 export const userRepository = {
 	insert: async (user: typeof UserTable.$inferInsert) => {
@@ -20,6 +21,7 @@ export const userRepository = {
 		revalidateUserCache(userId); // always revalidate cache after CRUD operations
 	},
 	delete: async (userId: string) => {
+		await userNotificationSettingsRepository.deleteByUserId(userId);
 		await db.delete(UserTable).where(eq(UserTable.id, userId));
 
 		revalidateUserCache(userId); // always revalidate cache after CRUD operations

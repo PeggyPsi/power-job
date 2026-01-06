@@ -17,7 +17,8 @@ type Events = {
 	"clerk/user.deleted": ClerkWebhookData<DeletedObjectJSON>
 
 	"clerk/organization.created": ClerkWebhookData<OrganizationJSON>,
-	// "clerk/organizationMembership.created": ClerkWebhookData<OrganizationMembershipJSON>
+	"clerk/organization.updated": ClerkWebhookData<OrganizationJSON>,
+	"clerk/organization.deleted": ClerkWebhookData<DeletedObjectJSON>,
 }
 
 // Create a client to send and receive events

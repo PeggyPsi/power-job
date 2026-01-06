@@ -4,6 +4,25 @@ import { OrganizationTable } from "./organization";
 import { relations } from "drizzle-orm";
 import { JobListingApplicationTable } from "./jobListingApplication";
 
+export interface JobListing {
+	id: string;
+	organizationId: string;
+	title: string;
+	description: string;
+	wage: number | null;
+	stateAbbreviation: string | null;
+	city: string | null;
+	isFeatured: boolean;
+	wageInterval: WageInterval | null;
+	locationRequirement: LocationRequirement;
+	experienceLevel: ExperienceLevel;
+	status: JobListingStatus;
+	type: JobListingType;
+	postedAt: Date | null;
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 // DEVNOTE: `number` on typeof references means "any index of the array".
 // So this gives us the type of any item in the array
 

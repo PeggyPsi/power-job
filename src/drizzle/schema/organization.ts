@@ -7,7 +7,7 @@ import { OrganizationUserSettingsTable } from "./organizationUserSettings";
 export type Organization = {
 	id: string;
 	name: string;
-	imageUrl: string;
+	imageUrl: string | null;
 	createdAt: Date;
 	updatedAt: Date;
 }

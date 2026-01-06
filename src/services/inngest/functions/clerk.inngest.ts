@@ -6,10 +6,11 @@ import { userRepository } from "@/features/users/db/users.repository";
 import { userNotificationSettingsRepository } from "@/features/users/db/userNotificationSettings.repository";
 import { organizationsRepository } from "@/features/organizations/db/organizations.repository";
 
+// DEV: this method is causing me trouble when i use it inside inngest functions
 // Helper method to verify Clerk webhooks
-function verifyWebhook({ raw, headers }: { raw: string, headers: Record<string, string> }) {
-	return new Webhook(env.CLERK_WEBHOOK_SECRET).verify(raw, headers);
-}
+// function verifyWebhook({ raw, headers }: { raw: string, headers: Record<string, string> }) {
+// 	return new Webhook(env.CLERK_WEBHOOK_SECRET).verify(raw, headers);
+// }
 
 // Users
 export const clerkCreateUser = inngest.createFunction({
@@ -20,15 +21,6 @@ export const clerkCreateUser = inngest.createFunction({
 		event: 'clerk/user.created'
 	},
 	async ({ event, step }) => {
-		// First step is to try andv verify the webhook
-		await step.run("verify-webhook", async () => {
-			try {
-				verifyWebhook(event.data); // sanity check
-			} catch (error) {
-				throw new NonRetriableError("Invalid webhook fro function clerk/create-user")
-			}
-		})
-
 		// Create actual user
 		const userId = await step.run("create-user", async () => {
 			const userData = event.data.data;
@@ -63,15 +55,6 @@ export const clerkUpdateUser = inngest.createFunction({
 		event: 'clerk/user.updated'
 	},
 	async ({ event, step }) => {
-		// First step is to try andv verify the webhook
-		await step.run("verify-webhook", async () => {
-			try {
-				verifyWebhook(event.data); // sanity check
-			} catch (error) {
-				throw new NonRetriableError("Invalid webhook fro function clerk/update-user")
-			}
-		})
-
 		// Update user
 		await step.run("update-user", async () => {
 			const userData = event.data.data;
@@ -99,15 +82,7 @@ export const clerkDeleteUser = inngest.createFunction({
 		event: 'clerk/user.deleted'
 	},
 	async ({ event, step }) => {
-		// First step is to try andv verify the webhook
-		await step.run("verify-webhook", async () => {
-			try {
-				verifyWebhook(event.data); // sanity check
-			} catch (error) {
-				throw new NonRetriableError("Invalid webhook fro function clerk/delete-user")
-			}
-		})
-
+		debugger;
 		// Create actual user
 		const userId = await step.run("delete-user", async () => {
 			const userIdToDelete = event.data.data?.id;
@@ -128,15 +103,6 @@ export const clerkCreateOrganization = inngest.createFunction({
 		event: 'clerk/organization.created'
 	},
 	async ({ event, step }) => {
-		// First step is to try andv verify the webhook
-		await step.run("verify-webhook", async () => {
-			try {
-				verifyWebhook(event.data); // sanity check
-			} catch (error) {
-				throw new NonRetriableError("Invalid webhook for function clerk/create-organization")
-			}
-		})
-
 		// Create actual organization
 		await step.run("create-organization", async () => {
 			const organizationData = event.data.data;
@@ -150,6 +116,49 @@ export const clerkCreateOrganization = inngest.createFunction({
 			})
 
 			return organizationData.id;
+		})
+	}
+);
+
+// Organizations
+export const clerkUpdateOrganization = inngest.createFunction({
+	id: "clerk/update-organization",
+	name: "Clerk - Update DB Organization"
+},
+	{
+		event: 'clerk/organization.updated'
+	},
+	async ({ event, step }) => {
+		// Create actual organization
+		await step.run("update-organization", async () => {
+			const organizationData = event.data.data;
+
+			await organizationsRepository.update(organizationData.id, {
+				id: organizationData.id,
+				name: organizationData.name,
+				imageUrl: organizationData.image_url,
+				createdAt: new Date(organizationData.created_at),
+				updatedAt: new Date(organizationData.updated_at)
+			})
+		})
+	}
+);
+
+export const clerkDeleteOrganization = inngest.createFunction({
+	id: "clerk/delete-organization",
+	name: "Clerk - Delete DB Organization"
+},
+	{
+		event: 'clerk/organization.deleted'
+	},
+	async ({ event, step }) => {
+		// Create actual organization
+		await step.run("delete-organization", async () => {
+			const organizationIdToDelete = event.data.data?.id;
+			if (!organizationIdToDelete) {
+				throw new NonRetriableError("No organization id found to delete");
+			}
+			await organizationsRepository.delete(organizationIdToDelete);
 		})
 	}
 );

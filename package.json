@@ -12,14 +12,17 @@
 		"db:generate": "node ./src/drizzle/generate-migration.js",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
-		"inngest": "inngest-cli dev -u http://localhost:3000/api/inngest"
+		"inngest": "inngest-cli dev --no-discovery -u http://localhost:3000/api/inngest"
 	},
 	"dependencies": {
-		"@clerk/nextjs": "^6.36.2",
-		"@clerk/themes": "^2.4.43",
+		"@clerk/nextjs": "^6.36.5",
+		"@clerk/themes": "^2.4.46",
+		"@hookform/resolvers": "^5.2.2",
 		"@radix-ui/react-avatar": "^1.1.11",
 		"@radix-ui/react-dialog": "^1.1.15",
 		"@radix-ui/react-dropdown-menu": "^2.1.16",
+		"@radix-ui/react-label": "^2.1.8",
+		"@radix-ui/react-select": "^2.2.6",
 		"@radix-ui/react-separator": "^1.1.8",
 		"@radix-ui/react-slot": "^1.2.4",
 		"@radix-ui/react-tooltip": "^1.2.8",
@@ -27,15 +30,16 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"drizzle-orm": "^0.45.0",
-		"inngest": "^3.47.0",
+		"inngest": "^3.48.1",
 		"lucide-react": "^0.561.0",
-		"next": "16.0.10",
+		"next": "16.1.1",
 		"pg": "^8.16.3",
-		"react": "19.2.1",
-		"react-dom": "19.2.1",
+		"react": "19.2.3",
+		"react-dom": "19.2.3",
+		"react-hook-form": "^7.70.0",
 		"svix": "^1.82.0",
 		"tailwind-merge": "^3.4.0",
-		"zod": "^4.1.13"
+		"zod": "^4.3.5"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4",

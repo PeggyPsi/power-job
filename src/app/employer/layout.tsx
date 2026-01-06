@@ -49,7 +49,7 @@ async function LayoutSuspense({ children }: { children: React.ReactNode }) {
           <SidebarNavMenuGroup className="mt-auto" items={menuItems} />
         </>
       }
-      footerButton={<SidebarOrganizationBtn />} // TODO: change
+      footerButton={<SidebarOrganizationBtn />}
     >
       {children}
     </AppSidebar>
