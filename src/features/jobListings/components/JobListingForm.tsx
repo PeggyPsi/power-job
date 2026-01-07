@@ -21,8 +21,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { wageIntervals } from "@/drizzle/schema";
-import { formatWageInterval } from "../lib/formatters";
+import { locationRequirements, wageIntervals } from "@/drizzle/schema";
+import {
+  formatLocationRequirement,
+  formatWageInterval,
+} from "../lib/formatters";
+import StateSelectItems from "./StateSelectItems";
+import dynamic from "next/dynamic";
+
+const NON_SELECTED_VALUE = "none";
+const MarkdownEditor = dynamic(
+  () => import("../../../components/markdown/MarkdownEditor"),
+  { ssr: false }
+);
 
 export default function JobListingForm() {
   const form = useForm({
@@ -119,6 +130,100 @@ export default function JobListingForm() {
             )}
           />
         </div>
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-x-4 gap-y-6 items-start">
+          <div className="grid grid-cols-1 @md:grid-cols-2 gap-x-2 gap-y-6 items-start">
+            <FormField
+              name="city"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="stateAbbreviation"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>State</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value ?? ""}
+                      onValueChange={(val) => {
+                        field.onChange(val === NON_SELECTED_VALUE ? null : val);
+                      }}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {field.value !== null && (
+                          <SelectItem
+                            value={NON_SELECTED_VALUE}
+                            className="text-muted-background"
+                          >
+                            Clear
+                          </SelectItem>
+                        )}
+                        <StateSelectItems />
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div>
+            <FormField
+              name="locationRequirement"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location Requirement</FormLabel>
+                  <Select
+                    value={field.value ?? ""}
+                    onValueChange={(val) => field.onChange(val ?? null)}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {locationRequirements.map((locReq) => (
+                        <SelectItem key={locReq} value={locReq}>
+                          {formatLocationRequirement(locReq)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <FormField
+          name="title"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <MarkdownEditor markdown={field.value ?? ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );
