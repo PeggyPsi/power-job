@@ -10,7 +10,7 @@ import SidebarOrganizationButtonClient from "./_SidebarOrganizationButtonClient"
 export default async function SidebarOrganizationBtn() {
   const [{ user }, { organization }] = await Promise.all([
     getCurrentUser({ allData: true }),
-    getCurrentOrganization({ allData: true }),
+    getCurrentOrganization(true),
   ]);
 
   if (!user || !organization) {

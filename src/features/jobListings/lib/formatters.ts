@@ -1,4 +1,4 @@
-import { LocationRequirement, WageInterval } from "@/drizzle/schema";
+import { ExperienceLevel, JobListingType, LocationRequirement, WageInterval } from "@/drizzle/schema";
 
 export function formatWageInterval(interval: WageInterval) {
 	switch (interval) {
@@ -21,5 +21,31 @@ export function formatLocationRequirement(locationRequirement: LocationRequireme
 			return "Remote";
 		default:
 			throw new Error(`Unknown location requirement: ${locationRequirement}`);
+	}
+}
+
+export function formatJobListingType(jobType: JobListingType) {
+	switch (jobType) {
+		case "internship":
+			return "Internship";
+		case "full-time":
+			return "Full Time";
+		case "part-time":
+			return "Part Time";
+		default:
+			throw new Error(`Unknown job listing type: ${jobType}`);
+	}
+}
+
+export function formatExperienceLevel(expLvl: ExperienceLevel) {
+	switch (expLvl) {
+		case "junior":
+			return "Junior";
+		case "mid-level":
+			return "Mid-Level";
+		case "senior":
+			return "Senior";
+		default:
+			throw new Error(`Unknown experience level: ${expLvl}`);
 	}
 }

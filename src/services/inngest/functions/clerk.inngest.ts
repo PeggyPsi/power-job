@@ -1,6 +1,4 @@
-import { env } from "@/data/env/server";
 import { inngest } from "../client";
-import { Webhook } from "svix";
 import { NonRetriableError } from "inngest";
 import { userRepository } from "@/features/users/db/users.repository";
 import { userNotificationSettingsRepository } from "@/features/users/db/userNotificationSettings.repository";

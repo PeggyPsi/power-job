@@ -16,7 +16,7 @@ export async function getCurrentUser({ allData = false }) {
 	}
 }
 
-export async function getCurrentOrganization({ allData = false }) {
+export async function getCurrentOrganization(allData = false) {
 	const { orgId } = await auth();
 
 	return {

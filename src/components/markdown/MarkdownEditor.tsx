@@ -26,6 +26,7 @@ const markdownClassNames =
   "max-w-none prose prose-neutral dark:prose-invert font-sans";
 
 // TODO: add max height and min height props
+// TODO: changing header type is not working as it should
 
 /**
  * Extend this Component further with the necessary plugins or props you need.

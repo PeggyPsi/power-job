@@ -1,15 +1,14 @@
-import { experienceLevels, jobListingStatuses, jobListingTypes, locationRequirements, wageIntervals } from "@/drizzle/schema";
-import { desc } from "drizzle-orm";
+import { experienceLevels, /*jobListingStatuses,*/ jobListingTypes, locationRequirements, wageIntervals } from "@/drizzle/schema";
 import z from "zod";
 
 export const jobListingsSchema = z.object({
-	title: z.string().min(1),
-	description: z.string().min(1),
+	title: z.string().min(1, "Required"),
+	description: z.string().min(1, "Required"),
 	locationRequirement: z.enum(locationRequirements),
 	wage: z.number().int().positive().min(1).nullable(),
 	wageInterval: z.enum(wageIntervals).nullable(),
 	experienceLevel: z.enum(experienceLevels),
-	status: z.enum(jobListingStatuses),
+	//status: z.enum(jobListingStatuses),
 	type: z.enum(jobListingTypes),
 	stateAbbreviation: z.string().transform(val => val.trim() === "" ? null : val).nullable(), // with transform we ensure that empty strings are stored as null in DB
 	city: z.string().transform(val => val.trim() === "" ? null : val).nullable(), // with transform we ensure that empty strings are stored as null in DB

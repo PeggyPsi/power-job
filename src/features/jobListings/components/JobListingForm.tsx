@@ -21,13 +21,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { locationRequirements, wageIntervals } from "@/drizzle/schema";
 import {
+  experienceLevels,
+  jobListingTypes,
+  locationRequirements,
+  wageIntervals,
+} from "@/drizzle/schema";
+import {
+  formatExperienceLevel,
+  formatJobListingType,
   formatLocationRequirement,
   formatWageInterval,
 } from "../lib/formatters";
 import StateSelectItems from "./StateSelectItems";
 import dynamic from "next/dynamic";
+import { Button } from "@/components/ui/button";
+import LoadingSwap from "@/components/LoadingSwap";
+import { createJobListing } from "../actions/actions";
+import { toast } from "sonner";
 
 const NON_SELECTED_VALUE = "none";
 const MarkdownEditor = dynamic(
@@ -51,8 +62,12 @@ export default function JobListingForm() {
     },
   });
 
-  function onsubmit(data: z.infer<typeof jobListingsSchema>) {
-    console.log("Form submitted with data:", data);
+  async function onsubmit(data: z.infer<typeof jobListingsSchema>) {
+    const res = await createJobListing(data);
+
+    if (res.error) {
+      toast.error(res.message || "Failed to create job listing");
+    }
   }
 
   return (
@@ -205,25 +220,101 @@ export default function JobListingForm() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
                 </FormItem>
               )}
             />
           </div>
         </div>
 
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-x-4 gap-y-6 items-start">
+          <FormField
+            name="type"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Job Type</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value ?? ""}
+                    onValueChange={(val) => {
+                      field.onChange(val);
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {jobListingTypes.map((jobType) => (
+                        <SelectItem key={jobType} value={jobType}>
+                          {formatJobListingType(jobType)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="experienceLevel"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Experience Level</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value ?? ""}
+                    onValueChange={(val) => {
+                      field.onChange(val);
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {experienceLevels.map((expLvl) => (
+                        <SelectItem key={expLvl} value={expLvl}>
+                          {formatExperienceLevel(expLvl)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
-          name="title"
+          name="description"
           control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <MarkdownEditor markdown={field.value ?? ""} />
+                <MarkdownEditor {...field} markdown={field.value ?? ""} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        <Button
+          disabled={form.formState.isSubmitting}
+          type="submit"
+          className="w-full"
+        >
+          <LoadingSwap isLoading={form.formState.isSubmitting}>
+            Create Job Listing
+          </LoadingSwap>
+        </Button>
       </form>
     </Form>
   );
