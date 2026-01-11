@@ -34,17 +34,13 @@ import {
   formatWageInterval,
 } from "../lib/formatters";
 import StateSelectItems from "./StateSelectItems";
-import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import LoadingSwap from "@/components/LoadingSwap";
 import { createJobListing } from "../actions/actions";
 import { toast } from "sonner";
+import { MarkdownEditor } from "@/components/markdown/MarkdownEditor";
 
 const NON_SELECTED_VALUE = "none";
-const MarkdownEditor = dynamic(
-  () => import("../../../components/markdown/MarkdownEditor"),
-  { ssr: false }
-);
 
 export default function JobListingForm() {
   const form = useForm({
