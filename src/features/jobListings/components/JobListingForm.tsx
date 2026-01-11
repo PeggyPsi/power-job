@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import {
   experienceLevels,
+  JobListingTable,
   jobListingTypes,
   locationRequirements,
   wageIntervals,
@@ -36,16 +37,32 @@ import {
 import StateSelectItems from "./StateSelectItems";
 import { Button } from "@/components/ui/button";
 import LoadingSwap from "@/components/LoadingSwap";
-import { createJobListing } from "../actions/actions";
+import { createJobListing, updateJoblisting } from "../actions/actions";
 import { toast } from "sonner";
 import { MarkdownEditor } from "@/components/markdown/MarkdownEditor";
 
 const NON_SELECTED_VALUE = "none";
 
-export default function JobListingForm() {
+export default function JobListingForm({
+  jobListing,
+}: {
+  jobListing?: Pick<
+    typeof JobListingTable.$inferSelect,
+    | "id"
+    | "title"
+    | "description"
+    | "locationRequirement"
+    | "wage"
+    | "wageInterval"
+    | "experienceLevel"
+    | "type"
+    | "stateAbbreviation"
+    | "city"
+  >;
+}) {
   const form = useForm({
     resolver: zodResolver(jobListingsSchema),
-    defaultValues: {
+    defaultValues: jobListing ?? {
       title: "",
       description: "",
       locationRequirement: "in-office",
@@ -59,7 +76,9 @@ export default function JobListingForm() {
   });
 
   async function onsubmit(data: z.infer<typeof jobListingsSchema>) {
-    const res = await createJobListing(data);
+    const res = jobListing
+      ? await updateJoblisting(jobListing.id, data)
+      : await createJobListing(data);
 
     if (res.error) {
       toast.error(res.message || "Failed to create job listing");
@@ -308,7 +327,7 @@ export default function JobListingForm() {
           className="w-full"
         >
           <LoadingSwap isLoading={form.formState.isSubmitting}>
-            Create Job Listing
+            {!jobListing ? "Create Job Listing" : "Update Job Listing"}
           </LoadingSwap>
         </Button>
       </form>

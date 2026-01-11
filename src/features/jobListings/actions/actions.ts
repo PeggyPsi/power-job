@@ -9,11 +9,15 @@ import { jobListingsSchema } from "./schemas";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
 import { jobListingsRepository } from "../db/jobListings.repository";
 import { redirect } from "next/navigation";
+import { cacheTag } from "next/cache";
+import { getJobListingIdTag } from "../db/cache/jobListings";
+import { db } from "@/drizzle/db";
+import { and, eq } from "drizzle-orm";
+import { JobListingTable } from "@/drizzle/schema";
 
 export async function createJobListing(unsafeData: z.infer<typeof jobListingsSchema>) {
 	// Implementation for creating a job listing
 	const { orgId } = await getCurrentOrganization();
-
 	if (orgId == null) {
 		return {
 			error: true,
@@ -37,4 +41,49 @@ export async function createJobListing(unsafeData: z.infer<typeof jobListingsSch
 	});
 
 	redirect(`/employer/job-listings/${newJobListing.id}`);
+}
+
+export async function updateJoblisting(jobListingId: string, unsafeData: z.infer<typeof jobListingsSchema>) {
+	// Implementation for creating a job listing
+	const { orgId } = await getCurrentOrganization();
+	if (orgId == null) {
+		return {
+			error: true,
+			message: "No organization found for the current user."
+		}
+	}
+
+	// We try and make sure that the data are valid before proceeding
+	const { success, data } = jobListingsSchema.safeParse(unsafeData);
+	if (!success) {
+		return {
+			error: true,
+			message: "The provided data is invalid.",
+		}
+	}
+
+	const jobListing = await getJobListing(jobListingId, orgId)
+	if (jobListing == null) {
+		return {
+			error: true,
+			message: "There was an error updating your job listing",
+		}
+	}
+
+	const updatedJobListing = await jobListingsRepository.update(jobListingId, orgId, data);
+
+	redirect(`/employer/job-listings/${updatedJobListing.id}`);
+}
+
+
+async function getJobListing(id: string, orgId: string) {
+	"use cache"
+	cacheTag(getJobListingIdTag(id))
+
+	return db.query.JobListingTable.findFirst({
+		where: and(
+			eq(JobListingTable.id, id),
+			eq(JobListingTable.organizationId, orgId)
+		),
+	})
 }

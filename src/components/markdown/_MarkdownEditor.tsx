@@ -33,7 +33,6 @@ export default function InternalMarkdownEditor({
     <MDXEditor
       {...props}
       ref={ref}
-      onChange={(e) => console.log(e)}
       className={cn(markdownClassNames, isDarkMode && "dark-theme", className)}
       suppressHtmlProcessing
       plugins={[
