@@ -1,12 +1,13 @@
+import { AsyncIf } from "@/components/AsyncIf";
 import { MarkdownPartial } from "@/components/markdown/MarkdownPartial";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import JobListingBadges from "@/features/jobListings/components/JobListingBadges";
 import { getJobListingIdTag } from "@/features/jobListings/db/cache/jobListings";
 import { jobListingsRepository } from "@/features/jobListings/db/jobListings.repository";
-import { formatJobListingStatus } from "@/features/jobListings/lib/formatters";
+import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
+import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
 import { SquarePen } from "lucide-react";
 import { cacheTag } from "next/cache";
 import Link from "next/link";
@@ -45,11 +46,19 @@ async function SuspendedPage({ params }: IProps) {
           </div>
         </div>
         <div className="flex items-center gap-2 empty:-mt-4">
-          <Button asChild variant={"outline"}>
-            <Link href={`/employer/job-listings/${jobListingId}/edit`}>
-              <SquarePen /> Edit
-            </Link>
-          </Button>
+          <AsyncIf
+            condition={() =>
+              hasOrgUserPermission(
+                ClerkConfiguration.UserPermissions.JobListings.Update
+              )
+            }
+          >
+            <Button asChild variant={"outline"}>
+              <Link href={`/employer/job-listings/${jobListingId}/edit`}>
+                <SquarePen /> Edit
+              </Link>
+            </Button>
+          </AsyncIf>
         </div>
       </div>
 

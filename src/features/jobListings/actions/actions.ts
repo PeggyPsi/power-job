@@ -14,14 +14,17 @@ import { getJobListingIdTag } from "../db/cache/jobListings";
 import { db } from "@/drizzle/db";
 import { and, eq } from "drizzle-orm";
 import { JobListingTable } from "@/drizzle/schema";
+import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
+import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
 
 export async function createJobListing(unsafeData: z.infer<typeof jobListingsSchema>) {
 	// Implementation for creating a job listing
 	const { orgId } = await getCurrentOrganization();
-	if (orgId == null) {
+	const hasPermission = await hasOrgUserPermission(ClerkConfiguration.UserPermissions.JobListings.Create);
+	if (orgId == null || !hasPermission) {
 		return {
 			error: true,
-			message: "No organization found for the current user."
+			message: "You dont have permissions to create a new job listing"
 		}
 	}
 
@@ -46,10 +49,11 @@ export async function createJobListing(unsafeData: z.infer<typeof jobListingsSch
 export async function updateJoblisting(jobListingId: string, unsafeData: z.infer<typeof jobListingsSchema>) {
 	// Implementation for creating a job listing
 	const { orgId } = await getCurrentOrganization();
-	if (orgId == null) {
+	const hasPermission = await hasOrgUserPermission(ClerkConfiguration.UserPermissions.JobListings.Update);
+	if (orgId == null || !hasPermission) {
 		return {
 			error: true,
-			message: "No organization found for the current user."
+			message: "You dont have permissions to uddate the job listing"
 		}
 	}
 

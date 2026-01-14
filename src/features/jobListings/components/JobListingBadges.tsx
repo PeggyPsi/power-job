@@ -4,6 +4,7 @@ import { ComponentProps } from "react";
 import {
   formatExperienceLevel,
   formatJobListingLocation,
+  formatJobListingStatus,
   formatJobListingType,
   formatLocationRequirement,
   formatWage,
@@ -39,6 +40,9 @@ export default function JobListingBadges(props: {
 
   return (
     <>
+      <Badge {...badgeProps} variant={"default"}>
+        {formatJobListingStatus(props.jobsListing.status)}
+      </Badge>
       {props.jobsListing.isFeatured && (
         <Badge
           {...badgeProps}
