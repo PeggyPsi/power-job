@@ -80,7 +80,7 @@ export async function updateJoblisting(jobListingId: string, unsafeData: z.infer
 }
 
 
-async function getJobListing(id: string, orgId: string) {
+export async function getJobListing(id: string, orgId: string) {
 	"use cache"
 	cacheTag(getJobListingIdTag(id))
 

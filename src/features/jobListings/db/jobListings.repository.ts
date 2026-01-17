@@ -2,7 +2,6 @@ import { db } from "@/drizzle/db";
 import { JobListingTable, JobListing } from "@/drizzle/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidateJobListingCache } from "./cache/jobListings";
-import { get } from "http";
 
 export const jobListingsRepository = {
 	getByOrganization: async (orgId: string): Promise<JobListing> => {

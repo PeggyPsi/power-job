@@ -2,14 +2,17 @@ import { AsyncIf } from "@/components/AsyncIf";
 import { MarkdownPartial } from "@/components/markdown/MarkdownPartial";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent } from "@/components/ui/popover";
+import { JobListingStatus } from "@/drizzle/schema";
+import { getJobListing } from "@/features/jobListings/actions/actions";
 import JobListingBadges from "@/features/jobListings/components/JobListingBadges";
-import { getJobListingIdTag } from "@/features/jobListings/db/cache/jobListings";
-import { jobListingsRepository } from "@/features/jobListings/db/jobListings.repository";
+import { hasReachedMaxPostedJobListings } from "@/features/jobListings/lib/planFeatureHelpers";
+import { getNextJobListingStatus } from "@/features/jobListings/lib/utils";
 import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
 import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
-import { SquarePen } from "lucide-react";
-import { cacheTag } from "next/cache";
+import { PopoverTrigger } from "@radix-ui/react-popover";
+import { EyeIcon, EyeOffIcon, SquarePen } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -59,6 +62,7 @@ async function SuspendedPage({ params }: IProps) {
               </Link>
             </Button>
           </AsyncIf>
+          <StatusUpdateButton currentStatus={jobListing.status} />
         </div>
       </div>
 
@@ -76,8 +80,70 @@ async function SuspendedPage({ params }: IProps) {
   );
 }
 
-async function getJobListing(jobListingId: string, orgId: string) {
-  "use cache";
-  cacheTag(getJobListingIdTag(jobListingId));
-  return await jobListingsRepository.getById(jobListingId, orgId);
+function StatusUpdateButton({
+  currentStatus,
+}: {
+  currentStatus: JobListingStatus;
+}) {
+  const toggleButton = <Button variant={"outline"}>Toogle</Button>;
+
+  return (
+    <AsyncIf
+      condition={() =>
+        hasOrgUserPermission(
+          ClerkConfiguration.UserPermissions.JobListings.ChangeStatus
+        )
+      }
+    >
+      {getNextJobListingStatus(currentStatus) === "published" ? (
+        <AsyncIf
+          condition={async () => {
+            // There might be a case where the user has Post{x}JobListings plan feature.
+            // Based on x or whether he has a plan feature of this kind, we need to let him or not let him post the jobListing
+            const hasMaxed = await hasReachedMaxPostedJobListings();
+            return !hasMaxed;
+          }}
+          otherwise={
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant={"outline"}>
+                  {statusToggleButtonText(currentStatus)}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                You must upgrade your plan to publish more job listings
+                <Button asChild className="mt-2">
+                  <Link href={"/employer/pricing"}>Upgrade Plan</Link>
+                </Button>
+              </PopoverContent>
+            </Popover>
+          }
+        >
+          {toggleButton}
+        </AsyncIf>
+      ) : (
+        toggleButton
+      )}
+    </AsyncIf>
+  );
+}
+
+function statusToggleButtonText(status: JobListingStatus) {
+  switch (status) {
+    case "draft":
+    case "delisted":
+      return (
+        <>
+          <EyeIcon className="size-4" /> Publish
+        </>
+      );
+    case "published":
+      return (
+        <>
+          <EyeOffIcon className="size-4" /> Delist
+        </>
+      );
+    default:
+      throw new Error(`Unknown job listing status ${status satisfies never}`);
+  }
 }

@@ -1,9 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { getJobListing } from "@/features/jobListings/actions/actions";
 import JobListingForm from "@/features/jobListings/components/JobListingForm";
-import { getJobListingIdTag } from "@/features/jobListings/db/cache/jobListings";
-import { jobListingsRepository } from "@/features/jobListings/db/jobListings.repository";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
-import { cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -38,10 +36,4 @@ async function SuspendedPage({ params }: IPageProps) {
   if (!jobListing) return notFound();
 
   return <JobListingForm jobListing={jobListing} />;
-}
-
-async function getJobListing(jobListingId: string, orgId: string) {
-  "use cache";
-  cacheTag(getJobListingIdTag(jobListingId));
-  return await jobListingsRepository.getById(jobListingId, orgId);
 }

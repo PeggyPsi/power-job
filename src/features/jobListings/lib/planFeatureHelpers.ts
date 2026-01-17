@@ -1,0 +1,51 @@
+import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
+import { cacheTag } from "next/cache";
+import { getJobListingOrganizationTag } from "../db/cache/jobListings";
+import { db } from "@/drizzle/db";
+import { JobListingTable } from "@/drizzle/schema";
+import { and, count, eq } from "drizzle-orm";
+import { hasPlanFeature } from "@/services/clerk/lib/planFeatures";
+import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
+
+/** Based on current plan check if the user can post */
+export async function hasReachedMaxPostedJobListings() {
+	const { orgId } = await getCurrentOrganization();
+	if (!orgId) return true; // No organization, so yeah....maxed
+
+	const count = await getPublishedJobListingsCount(orgId);
+
+	if (await hasPlanFeature(ClerkConfiguration.PlanFeatures.Post1JobListings) && count >= 1)
+		return true;
+
+	if (await hasPlanFeature(ClerkConfiguration.PlanFeatures.Post3JobListings) && count >= 3)
+		return true;
+
+	if (await hasPlanFeature(ClerkConfiguration.PlanFeatures.Post15JobListings) && count >= 15)
+		return true;
+
+	// User must have either of the following plans and not exceeded the corresponding allowed job listings posts
+	const canPost = await Promise.all(
+		[
+			hasPlanFeature(ClerkConfiguration.PlanFeatures.Post1JobListings).then(has => has && count < 1),
+			hasPlanFeature(ClerkConfiguration.PlanFeatures.Post3JobListings).then(has => has && count < 3),
+			hasPlanFeature(ClerkConfiguration.PlanFeatures.Post15JobListings).then(has => has && count < 15)
+		]
+	)
+
+	return !canPost.some(Boolean);
+}
+
+async function getPublishedJobListingsCount(orgId: string) {
+	"use cache";
+	cacheTag(getJobListingOrganizationTag(orgId))
+
+	const [res] = await db
+		.select({ count: count() })
+		.from(JobListingTable)
+		.where(and(
+			eq(JobListingTable.organizationId, orgId),
+			eq(JobListingTable.status, "published")
+		));
+
+	return res?.count ?? 0;
+}
