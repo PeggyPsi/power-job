@@ -15,7 +15,7 @@ import { PopoverTrigger } from "@radix-ui/react-popover";
 import { EyeIcon, EyeOffIcon, SquarePen } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { ReactNode, Suspense } from "react";
 
 interface IProps {
   params: Promise<{ jobListingId: string }>;
@@ -104,19 +104,12 @@ function StatusUpdateButton({
             return !hasMaxed;
           }}
           otherwise={
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant={"outline"}>
-                  {statusToggleButtonText(currentStatus)}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent>
-                You must upgrade your plan to publish more job listings
-                <Button asChild className="mt-2">
-                  <Link href={"/employer/pricing"}>Upgrade Plan</Link>
-                </Button>
-              </PopoverContent>
-            </Popover>
+            <UpgradePopover
+              buttonText={statusToggleButtonText(currentStatus)}
+              popoverText={
+                "You must upgrade your plan to publish more job listings"
+              }
+            />
           }
         >
           {toggleButton}
@@ -125,6 +118,27 @@ function StatusUpdateButton({
         toggleButton
       )}
     </AsyncIf>
+  );
+}
+function UpgradePopover({
+  buttonText,
+  popoverText,
+}: {
+  buttonText: ReactNode;
+  popoverText: ReactNode;
+}) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant={"outline"}>{buttonText}</Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        {popoverText}
+        <Button asChild className="mt-2">
+          <Link href={"/employer/pricing"}>Upgrade Plan</Link>
+        </Button>
+      </PopoverContent>
+    </Popover>
   );
 }
 
