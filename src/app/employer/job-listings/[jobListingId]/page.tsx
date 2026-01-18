@@ -7,16 +7,26 @@ import { Popover, PopoverContent } from "@/components/ui/popover";
 import { JobListingStatus } from "@/drizzle/schema";
 import {
   getJobListing,
+  toggleJobListingFeatured,
   toggleJobListingStatus,
 } from "@/features/jobListings/actions/actions";
 import JobListingBadges from "@/features/jobListings/components/JobListingBadges";
-import { hasReachedMaxPostedJobListings } from "@/features/jobListings/lib/planFeatureHelpers";
+import {
+  hasReachedMaxFeaturedJobListings,
+  hasReachedMaxPostedJobListings,
+} from "@/features/jobListings/lib/planFeatureHelpers";
 import { getNextJobListingStatus } from "@/features/jobListings/lib/utils";
 import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
 import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
 import { PopoverTrigger } from "@radix-ui/react-popover";
-import { EyeIcon, EyeOffIcon, SquarePen } from "lucide-react";
+import {
+  EyeIcon,
+  EyeOffIcon,
+  SquarePen,
+  StarIcon,
+  StarOffIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ReactNode, Suspense } from "react";
@@ -70,6 +80,12 @@ async function SuspendedPage({ params }: IProps) {
             currentStatus={jobListing.status}
             jobListingId={jobListingId}
           />
+          {jobListing.status === "published" && (
+            <FeaturedToggleButton
+              isFeatured={jobListing.isFeatured}
+              jobListingId={jobListing.id}
+            />
+          )}
         </div>
       </div>
 
@@ -87,6 +103,7 @@ async function SuspendedPage({ params }: IProps) {
   );
 }
 
+/** Button to update the status of a job listing */
 function StatusUpdateButton({
   jobListingId,
   currentStatus,
@@ -140,6 +157,61 @@ function StatusUpdateButton({
     </AsyncIf>
   );
 }
+
+function FeaturedToggleButton({
+  jobListingId,
+  isFeatured,
+}: {
+  jobListingId: string;
+  isFeatured: boolean;
+}) {
+  const toggleButton = (
+    <ActionButton
+      action={toggleJobListingFeatured.bind(null, jobListingId)}
+      variant={"outline"}
+      requireAreYouSure={!isFeatured}
+      areYouSureDescription="This will immediately feature this job listing."
+    >
+      {featureToggleButtonText(isFeatured)}
+    </ActionButton>
+  );
+
+  return (
+    <AsyncIf
+      condition={() =>
+        hasOrgUserPermission(
+          ClerkConfiguration.UserPermissions.JobListings.ChangeStatus
+        )
+      }
+    >
+      {isFeatured ? (
+        toggleButton
+      ) : (
+        <AsyncIf
+          condition={async () => {
+            // There might be a case where the user has Featured{x}JobListings plan feature.
+            // Based on x or whether he has a plan feature of this kind, we need to let him or not let him feature the jobListing
+            const hasMaxed = await hasReachedMaxFeaturedJobListings();
+            // TODO: feature / unfeature and re-feature shows dialog because teh cache still sees jobListing as featured
+            console.log("FeaturedToggleButton - hasMaxed:", hasMaxed);
+            return !hasMaxed;
+          }}
+          otherwise={
+            <UpgradePopover
+              buttonText={featureToggleButtonText(isFeatured)}
+              popoverText={
+                "You must upgrade your plan to feature more job listings"
+              }
+            />
+          }
+        >
+          {toggleButton}
+        </AsyncIf>
+      )}
+    </AsyncIf>
+  );
+}
+
 function UpgradePopover({
   buttonText,
   popoverText,
@@ -179,5 +251,21 @@ function statusToggleButtonText(status: JobListingStatus) {
       );
     default:
       throw new Error(`Unknown job listing status ${status satisfies never}`);
+  }
+}
+
+function featureToggleButtonText(isFeatured: boolean) {
+  if (isFeatured) {
+    return (
+      <>
+        <StarOffIcon className="size-4" /> UnFeature
+      </>
+    );
+  } else {
+    return (
+      <>
+        <StarIcon className="size-4" /> Feature
+      </>
+    );
   }
 }

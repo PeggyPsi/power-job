@@ -5,7 +5,6 @@ import { revalidateOrganizationCache } from "./cache/organizations";
 
 export const organizationsRepository = {
 	insert: async (organization: typeof OrganizationTable.$inferInsert) => {
-		console.log("Inserting Organization: ", organization)
 		await db.insert(OrganizationTable).values(organization)
 			// If organization already exists, we do an upsett (update existing record)
 			.onConflictDoUpdate({

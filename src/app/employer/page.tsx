@@ -1,4 +1,4 @@
-import { getJobListingOrganizationTag } from "@/features/jobListings/db/cache/jobListings";
+import { getJobListingsOrganizationTag } from "@/features/jobListings/db/cache/jobListings";
 import { jobListingsRepository } from "@/features/jobListings/db/jobListings.repository";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
 import { cacheTag } from "next/cache";
@@ -28,7 +28,7 @@ async function SuspendedContent() {
 async function getMostRecentByOrganization(orgId: string) {
   "use cache";
 
-  cacheTag(getJobListingOrganizationTag(orgId)); // always get cached data
+  cacheTag(getJobListingsOrganizationTag(orgId)); // always get cached data
 
   return await jobListingsRepository.getMostRecentByOrganization(orgId);
 }

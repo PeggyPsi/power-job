@@ -5,7 +5,7 @@ export function getJobListingsGlobalTag() {
 	return getGlobalTag("jobListings");
 }
 
-export function getJobListingOrganizationTag(orgId: string) {
+export function getJobListingsOrganizationTag(orgId: string) {
 	return getOrganizationTag("jobListings", orgId);
 }
 
@@ -17,6 +17,6 @@ export function revalidateJobListingCache({ id, orgId }: { id: string, orgId: st
 	// Profile: max cache life
 	// The recommended value is "max" which provides stale-while-revalidate semantics, or any of the other default or custom profiles defined in cacheLife.
 	revalidateTag(getJobListingsGlobalTag(), "max");
-	revalidateTag(getJobListingOrganizationTag(orgId), "max");
+	revalidateTag(getJobListingsOrganizationTag(orgId), "max");
 	revalidateTag(getJobListingIdTag(id), "max");
 }

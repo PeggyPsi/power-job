@@ -31,7 +31,7 @@ export const jobListingsRepository = {
 			)
 		});
 	},
-	update: async (id: string, orgId: string, jobListing: Partial<typeof JobListingTable.$inferInsert>) => {
+	update: async (id: string, jobListing: Partial<typeof JobListingTable.$inferInsert>) => {
 		const [updatedListing] = await db.update(JobListingTable).set(jobListing).where(eq(JobListingTable.id, id)).returning({
 			id: JobListingTable.id,
 			orgId: JobListingTable.organizationId,
@@ -42,6 +42,16 @@ export const jobListingsRepository = {
 		return updatedListing;
 	},
 	updateStatus: async (id: string, statusData: Pick<typeof JobListingTable.$inferSelect, "status" | "isFeatured" | "postedAt">) => {
+		const [updatedListing] = await db.update(JobListingTable).set(statusData).where(eq(JobListingTable.id, id)).returning({
+			id: JobListingTable.id,
+			orgId: JobListingTable.organizationId,
+		})
+
+		revalidateJobListingCache(updatedListing); // always revalidate cache after CRUD operations
+
+		return updatedListing;
+	},
+	updateIsFeatured: async (id: string, statusData: Pick<typeof JobListingTable.$inferSelect, "isFeatured">) => {
 		const [updatedListing] = await db.update(JobListingTable).set(statusData).where(eq(JobListingTable.id, id)).returning({
 			id: JobListingTable.id,
 			orgId: JobListingTable.organizationId,
