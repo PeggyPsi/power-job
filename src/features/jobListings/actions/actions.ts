@@ -120,10 +120,14 @@ export async function toggleJobListingFeatured(id: string) {
 	const jobListing = await getJobListing(id, orgId)
 	if (jobListing == null) return error
 
+	console.log("toggleJobListingFeatured - jobListing:", jobListing);
+
 	const newFeaturedStatus = !jobListing.isFeatured
+	const hasMaxed = await hasReachedMaxFeaturedJobListings();
+	console.log("toggleJobListingFeatured - hasMaxed:", hasMaxed);
 	if (
 		!(await hasOrgUserPermission("org:job_listings:change_status")) ||
-		(newFeaturedStatus && (await hasReachedMaxFeaturedJobListings()))
+		(newFeaturedStatus && hasMaxed)
 	) {
 		return error
 	}

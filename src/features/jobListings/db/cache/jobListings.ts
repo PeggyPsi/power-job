@@ -1,4 +1,5 @@
 import { getGlobalTag, getIdTag, getOrganizationTag } from "@/lib/dataCache";
+import { profile } from "console";
 import { revalidateTag } from "next/cache";
 
 export function getJobListingsGlobalTag() {
@@ -16,7 +17,7 @@ export function getJobListingIdTag(id: string) {
 export function revalidateJobListingCache({ id, orgId }: { id: string, orgId: string }) {
 	// Profile: max cache life
 	// The recommended value is "max" which provides stale-while-revalidate semantics, or any of the other default or custom profiles defined in cacheLife.
-	revalidateTag(getJobListingsGlobalTag(), "max");
-	revalidateTag(getJobListingsOrganizationTag(orgId), "max");
-	revalidateTag(getJobListingIdTag(id), "max");
+	revalidateTag(getJobListingsGlobalTag(), "max")
+	revalidateTag(getJobListingsOrganizationTag(orgId), "max")
+	revalidateTag(getJobListingIdTag(id), "max")
 }
