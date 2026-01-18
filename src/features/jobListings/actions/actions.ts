@@ -16,6 +16,8 @@ import { and, eq } from "drizzle-orm";
 import { JobListingTable } from "@/drizzle/schema";
 import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
 import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
+import { getNextJobListingStatus } from "../lib/utils";
+import { hasReachedMaxPostedJobListings } from "../lib/planFeatureHelpers";
 
 export async function createJobListing(unsafeData: z.infer<typeof jobListingsSchema>) {
 	// Implementation for creating a job listing
@@ -79,6 +81,34 @@ export async function updateJoblisting(jobListingId: string, unsafeData: z.infer
 	redirect(`/employer/job-listings/${updatedJobListing.id}`);
 }
 
+export async function toggleJobListingStatus(id: string) {
+	// TODO: create an MethodError type
+	const error = {
+		error: true,
+		message: "You dont have permissions to change the job listing status"
+	}
+
+	const { orgId } = await getCurrentOrganization();
+	const hasPermission = await hasOrgUserPermission(ClerkConfiguration.UserPermissions.JobListings.ChangeStatus);
+	if (orgId == null || !hasPermission) return error
+
+	const jobListing = await getJobListing(id, orgId)
+	if (jobListing == null) return error;
+
+	const nextStatus = getNextJobListingStatus(jobListing.status);
+	const hasMaxed = await hasReachedMaxPostedJobListings();
+	if (nextStatus === "published" && hasMaxed) return error;
+
+	console.log(nextStatus);
+
+	await jobListingsRepository.updateStatus(id, {
+		status: nextStatus,
+		isFeatured: nextStatus === "published" ? false : true,
+		postedAt: nextStatus === "published" && jobListing.postedAt === null ? new Date() : null,
+	});
+
+	return { error: false }
+}
 
 export async function getJobListing(id: string, orgId: string) {
 	"use cache"

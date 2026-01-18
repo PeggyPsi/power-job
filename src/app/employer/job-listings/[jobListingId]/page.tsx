@@ -1,10 +1,14 @@
+import { ActionButton } from "@/components/ActionButton";
 import { AsyncIf } from "@/components/AsyncIf";
 import { MarkdownPartial } from "@/components/markdown/MarkdownPartial";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent } from "@/components/ui/popover";
 import { JobListingStatus } from "@/drizzle/schema";
-import { getJobListing } from "@/features/jobListings/actions/actions";
+import {
+  getJobListing,
+  toggleJobListingStatus,
+} from "@/features/jobListings/actions/actions";
 import JobListingBadges from "@/features/jobListings/components/JobListingBadges";
 import { hasReachedMaxPostedJobListings } from "@/features/jobListings/lib/planFeatureHelpers";
 import { getNextJobListingStatus } from "@/features/jobListings/lib/utils";
@@ -62,7 +66,10 @@ async function SuspendedPage({ params }: IProps) {
               </Link>
             </Button>
           </AsyncIf>
-          <StatusUpdateButton currentStatus={jobListing.status} />
+          <StatusUpdateButton
+            currentStatus={jobListing.status}
+            jobListingId={jobListingId}
+          />
         </div>
       </div>
 
@@ -81,11 +88,24 @@ async function SuspendedPage({ params }: IProps) {
 }
 
 function StatusUpdateButton({
+  jobListingId,
   currentStatus,
 }: {
+  jobListingId: string;
   currentStatus: JobListingStatus;
 }) {
-  const toggleButton = <Button variant={"outline"}>Toogle</Button>;
+  const nextStatus = getNextJobListingStatus(currentStatus);
+
+  const toggleButton = (
+    <ActionButton
+      action={toggleJobListingStatus.bind(null, jobListingId)}
+      variant={"outline"}
+      requireAreYouSure={nextStatus === "published"}
+      areYouSureDescription="This will immediately show this job listing to all users."
+    >
+      {statusToggleButtonText(currentStatus)}
+    </ActionButton>
+  );
 
   return (
     <AsyncIf
@@ -95,7 +115,7 @@ function StatusUpdateButton({
         )
       }
     >
-      {getNextJobListingStatus(currentStatus) === "published" ? (
+      {nextStatus === "published" ? (
         <AsyncIf
           condition={async () => {
             // There might be a case where the user has Post{x}JobListings plan feature.
