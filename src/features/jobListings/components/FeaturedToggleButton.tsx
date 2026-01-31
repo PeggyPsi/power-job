@@ -37,7 +37,6 @@ export default function FeaturedToggleButton({
         )
       }
     >
-      {isFeatured ? <>isFeatured: true</> : <>isFeatured: false</>}
       {isFeatured ? (
         toggleButton
       ) : (

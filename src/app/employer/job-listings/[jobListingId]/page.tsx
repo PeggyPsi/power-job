@@ -1,15 +1,19 @@
+import { ActionButton } from "@/components/ActionButton";
 import { AsyncIf } from "@/components/AsyncIf";
 import { MarkdownPartial } from "@/components/markdown/MarkdownPartial";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
-import { getJobListing } from "@/features/jobListings/actions/actions";
+import {
+  deleteJobListing,
+  getJobListing,
+} from "@/features/jobListings/actions/actions";
 import FeaturedToggleButton from "@/features/jobListings/components/FeaturedToggleButton";
 import JobListingBadges from "@/features/jobListings/components/JobListingBadges";
 import StatusUpdateButton from "@/features/jobListings/components/StatusUpdateButton";
 import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
 import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -49,7 +53,7 @@ async function SuspendedPage({ params }: IProps) {
           <AsyncIf
             condition={() =>
               hasOrgUserPermission(
-                ClerkConfiguration.UserPermissions.JobListings.Update
+                ClerkConfiguration.UserPermissions.JobListings.Update,
               )
             }
           >
@@ -69,6 +73,23 @@ async function SuspendedPage({ params }: IProps) {
               jobListingId={jobListing.id}
             />
           )}
+
+          <AsyncIf
+            condition={() =>
+              hasOrgUserPermission(
+                ClerkConfiguration.UserPermissions.JobListings.Delete,
+              )
+            }
+          >
+            <ActionButton
+              variant="destructive"
+              action={deleteJobListing.bind(null, jobListingId)}
+              requireAreYouSure
+            >
+              <Trash2Icon className="size-4" />
+              Delete
+            </ActionButton>
+          </AsyncIf>
         </div>
       </div>
 

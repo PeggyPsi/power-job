@@ -10,6 +10,10 @@ export function getOrganizationTag(tag: CacheTag, orgaizationId: string) {
 	return `organization:${orgaizationId}-${tag}` as const;
 }
 
+export function getJobListingTag(tag: CacheTag, jobListingTag: string) {
+	return `jobListing:${jobListingTag}-${tag}` as const;
+}
+
 export function getIdTag(tag: CacheTag, id: string) {
 	return `id:${id}-${tag}` as const;
 }

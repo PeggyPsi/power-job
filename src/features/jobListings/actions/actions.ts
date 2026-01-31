@@ -12,12 +12,13 @@ import { redirect } from "next/navigation";
 import { cacheTag } from "next/cache";
 import { getJobListingIdTag } from "../db/cache/jobListings";
 import { db } from "@/drizzle/db";
-import { and, eq } from "drizzle-orm";
-import { JobListingTable } from "@/drizzle/schema";
+import { and, count, desc, eq } from "drizzle-orm";
+import { JobListingApplicationTable, JobListingTable } from "@/drizzle/schema";
 import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
 import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
 import { getNextJobListingStatus } from "../lib/utils";
 import { hasReachedMaxFeaturedJobListings, hasReachedMaxPostedJobListings } from "../lib/planFeatureHelpers";
+import { title } from "process";
 
 export async function createJobListing(unsafeData: z.infer<typeof jobListingsSchema>) {
 	// Implementation for creating a job listing
@@ -137,6 +138,27 @@ export async function toggleJobListingFeatured(id: string) {
 	});
 
 	return { error: false }
+}
+
+export async function deleteJobListing(id: string) {
+	const error = {
+		error: true,
+		message:
+			"You don't have permission to delete this job listing",
+	}
+
+	const { orgId } = await getCurrentOrganization()
+	if (orgId == null) return error
+
+	const jobListing = await getJobListing(id, orgId)
+	if (jobListing == null) return error
+
+	if (!(await hasOrgUserPermission(ClerkConfiguration.UserPermissions.JobListings.Delete)))
+		return error;
+
+	await jobListingsRepository.delete(id, orgId);
+
+	redirect("/employer");
 }
 
 export async function getJobListing(id: string, orgId: string) {
