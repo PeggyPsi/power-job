@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
+import { getInitialsFromWords } from "@/lib/utils";
 import { SignOutButton, useClerk } from "@clerk/nextjs";
 import {
   ArrowLeftRightIcon,
@@ -38,7 +39,7 @@ interface ISidebarOrganizationInfo {
 }
 
 export default function SidebarOrganizationButtonClient(
-  props: ISidebarUserButtonClientProps
+  props: ISidebarUserButtonClientProps,
 ) {
   const { isMobile, setOpenMobile } = useSidebar();
   const { openOrganizationProfile } = useClerk();
@@ -115,12 +116,7 @@ function OrganizationInfo({
   organization: ISidebarOrganizationInfo;
   user: ISidebarUserInfo;
 }) {
-  // Get the initials from the user's name. For example Peggy Psi => PP
-  const nameInitials = organization.name
-    .split(" ")
-    .slice(0, 2)
-    .map((str) => str[0])
-    .join("");
+  const nameInitials = getInitialsFromWords(organization.name, 2);
 
   return (
     <div className="flex gap-2 items-center overflow-hidden">
