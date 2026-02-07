@@ -13,8 +13,10 @@ import {
 
 export default function JobSeekerLayout({
   children,
+  sidebar,
 }: {
   children: React.ReactNode;
+  sidebar: React.ReactNode;
 }) {
   const menuItems: Array<SidebarNavMenuGroupItem> = [
     {
@@ -43,7 +45,12 @@ export default function JobSeekerLayout({
 
   return (
     <AppSidebar
-      content={<SidebarNavMenuGroup className="mt-auto" items={menuItems} />}
+      content={
+        <>
+          {sidebar}
+          <SidebarNavMenuGroup className="mt-auto" items={menuItems} />
+        </>
+      }
       footerButton={<SidebarUserBtn />}
     >
       {children}
