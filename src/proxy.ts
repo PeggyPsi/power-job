@@ -10,6 +10,7 @@ const isPublicRoute = createRouteMatcher([
 	"/sign-up(.*)", // Sign up page 
 	"/forgot-password(.*)", // Forgot password page
 	"/api/(.*)", // API routes
+	"/job-listings(.*)", // Job listings page and details
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

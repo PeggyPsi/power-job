@@ -24,3 +24,4 @@ export function useIsDarkMode() {
 
 	return isDarkMode;
 }
+

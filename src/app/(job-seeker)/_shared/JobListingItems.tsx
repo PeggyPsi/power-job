@@ -29,10 +29,11 @@ import JobListingBadges from "@/features/jobListings/components/JobListingBadges
 import z from "zod";
 import { cacheTag } from "next/cache";
 import { getJobListingsGlobalTag } from "@/features/jobListings/db/cache/jobListings";
+import { getOrganizationIdTag } from "@/features/organizations/db/cache/organizations";
 
 type Props = {
-  searchParams: Promise<Record<string, string>>;
   params?: Promise<{ jobListingId: string }>;
+  searchParams: Promise<Record<string, string | string[]>>;
 };
 
 const searchParamsSchema = z.object({
@@ -144,7 +145,7 @@ function JobListingsListItem({
       </CardHeader>
       <CardContent className="flex flex-wrap gap-2">
         <JobListingBadges
-          jobsListing={jobListing}
+          jobListing={jobListing}
           className={jobListing.isFeatured ? "border-primary/35" : undefined}
         />
       </CardContent>
@@ -178,7 +179,7 @@ async function getJobListings(
   const whereConditions = getWhereConditionsBySearchParams(searchParams);
 
   // In all cases we want job listings that are published
-  return db.query.JobListingTable.findMany({
+  const listings = await db.query.JobListingTable.findMany({
     where: or(
       jobListingId
         ? and(
@@ -191,6 +192,7 @@ async function getJobListings(
     with: {
       organization: {
         columns: {
+          id: true,
           name: true,
           imageUrl: true,
         },
@@ -198,6 +200,12 @@ async function getJobListings(
     },
     orderBy: [desc(JobListingTable.isFeatured), desc(JobListingTable.postedAt)],
   });
+
+  listings.forEach((listing) => {
+    cacheTag(getOrganizationIdTag(listing.organization.id));
+  });
+
+  return listings;
 }
 
 function getWhereConditionsBySearchParams(

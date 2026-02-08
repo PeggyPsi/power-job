@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export default function JobListingBadges(props: {
-  jobsListing: Pick<
+  jobListing: Pick<
     typeof JobListingTable.$inferSelect,
     | "wage"
     | "wageInterval"
@@ -41,50 +41,50 @@ export default function JobListingBadges(props: {
   return (
     <>
       <Badge {...badgeProps} variant={"default"}>
-        {formatJobListingStatus(props.jobsListing.status)}
+        {formatJobListingStatus(props.jobListing.status)}
       </Badge>
-      {props.jobsListing.isFeatured && (
+      {props.jobListing.isFeatured && (
         <Badge
           {...badgeProps}
           className={cn(
             props.className,
-            "border-featured bg-featured/50 text-featured-foreground"
+            "border-featured bg-featured/50 text-featured-foreground",
           )}
         >
           Featured
         </Badge>
       )}
-      {props.jobsListing.wage != null && props.jobsListing.wageInterval && (
+      {props.jobListing.wage != null && props.jobListing.wageInterval && (
         <Badge {...badgeProps}>
           <BanknoteIcon />
-          {formatWage(props.jobsListing.wage, props.jobsListing.wageInterval)}
+          {formatWage(props.jobListing.wage, props.jobListing.wageInterval)}
         </Badge>
       )}
-      {props.jobsListing.stateAbbreviation && (
+      {props.jobListing.stateAbbreviation && (
         <Badge {...badgeProps}>
           <MapPinIcon />
           {formatJobListingLocation({
-            stateAbbreviation: props.jobsListing.stateAbbreviation,
-            city: props.jobsListing.city,
+            stateAbbreviation: props.jobListing.stateAbbreviation,
+            city: props.jobListing.city,
           })}
         </Badge>
       )}
-      {props.jobsListing.locationRequirement && (
+      {props.jobListing.locationRequirement && (
         <Badge {...badgeProps}>
           <BuildingIcon />
-          {formatLocationRequirement(props.jobsListing.locationRequirement)}
+          {formatLocationRequirement(props.jobListing.locationRequirement)}
         </Badge>
       )}
-      {props.jobsListing.locationRequirement && (
+      {props.jobListing.locationRequirement && (
         <Badge {...badgeProps}>
           <Hourglass />
-          {formatJobListingType(props.jobsListing.type)}
+          {formatJobListingType(props.jobListing.type)}
         </Badge>
       )}
-      {props.jobsListing.experienceLevel && (
+      {props.jobListing.experienceLevel && (
         <Badge {...badgeProps}>
           <GraduationCap />
-          {formatExperienceLevel(props.jobsListing.experienceLevel)}
+          {formatExperienceLevel(props.jobListing.experienceLevel)}
         </Badge>
       )}
     </>
