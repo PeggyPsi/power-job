@@ -1,5 +1,6 @@
-import { DeletedObjectJSON, OrganizationJSON, OrganizationMembershipJSON, UserJSON } from "@clerk/nextjs/server";
+import { DeletedObjectJSON, OrganizationJSON, UserJSON } from "@clerk/nextjs/server";
 import { EventSchemas, Inngest } from "inngest";
+import { AppWebhookData, JobListingApplicationJSON } from "../clerk/webhooks/models";
 
 // The type of data sent by Clerk webhooks
 // T corrensponds to the specific Clerk object being sent
@@ -19,6 +20,8 @@ type Events = {
 	"clerk/organization.created": ClerkWebhookData<OrganizationJSON>,
 	"clerk/organization.updated": ClerkWebhookData<OrganizationJSON>,
 	"clerk/organization.deleted": ClerkWebhookData<DeletedObjectJSON>,
+
+	"app/jobListingApplication.created": AppWebhookData<JobListingApplicationJSON>,
 }
 
 // Create a client to send and receive events

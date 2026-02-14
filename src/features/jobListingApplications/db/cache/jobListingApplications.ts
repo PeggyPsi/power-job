@@ -13,7 +13,7 @@ export function getJobListingApplicationIdTag({ jobListingId, userId }: { jobLis
 	return getIdTag("jobListingApplications", `${jobListingId}-${userId}`);
 }
 
-export function revalidateJobListingCache(id: { jobListingId: string, userId: string }) {
+export function revalidateJobListingApplicationsCache(id: { jobListingId: string, userId: string }) {
 	// Profile: max cache life
 	// The recommended value is "max" which provides stale-while-revalidate semantics, or any of the other default or custom profiles defined in cacheLife.
 	revalidateTag(getJobListingApplicationsGlobalTag(), "max")

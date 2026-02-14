@@ -29,6 +29,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { SignUpButton } from "@/services/clerk/components/AuthButtons";
+import { connection } from "next/server";
+import { differenceInDays } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { NewJobListingApplicationForm } from "@/features/jobListingApplications/components/NewJobListingApplicationForm";
+import { getJobListingApplication } from "@/features/jobListingApplications/actions/actions";
+import { getUserResume } from "@/features/usersResumes/actions/actions";
 
 type Props = {
   params: Promise<{ jobListingId: string }>;
@@ -36,7 +49,6 @@ type Props = {
 };
 
 export default async function JobListingPage({ params, searchParams }: Props) {
-  const { jobListingId } = await params;
   return (
     <>
       <ResizablePanelGroup
@@ -169,13 +181,72 @@ async function ApplyButton({ jobListingId }: { jobListingId: string }) {
           <Button>Apply</Button>
         </PopoverTrigger>
         <PopoverContent className="flex flex-col gap-2">
-          You need to create an account before applying for a job.
+          You need to login in or create an account before applying for a job.
           <SignUpButton />
         </PopoverContent>
       </Popover>
     );
 
-  // TODO: check if user has already applied for this job listing
+  // Check if user has already applied for this job listing
+  const application = await getJobListingApplication({ jobListingId, userId });
+  if (application != null) {
+    const formatter = new Intl.RelativeTimeFormat(undefined, {
+      style: "short",
+      numeric: "always",
+    });
+
+    // we need to await because we call a dynamic method, new Date() inside the differenceInDays function, which is not supported in static functions.
+    // Awaiting connection() makes this function dynamic and allows us to use new Date().
+    await connection();
+    const difference = differenceInDays(application.createdAt, new Date());
+
+    return (
+      <div className="text-muted-foreground text-sm">
+        You have already applied for this job{" "}
+        {difference === 0 ? "today" : formatter.format(difference, "days")}
+      </div>
+    );
+  }
+
+  // TODO: to uncomment - this is temporary
+  // If the user has not applied, show the apply button. But first check if they have a resume uploaded,
+  // if not show a popover prompting them to upload a resume before applying.
+  //   const userResume = await getUserResume(userId);
+  //   if (userResume == null) {
+  //     return (
+  //       <Popover>
+  //         <PopoverTrigger asChild>
+  //           <Button>Apply</Button>
+  //         </PopoverTrigger>
+  //         <PopoverContent className="flex flex-col gap-2">
+  //           You need to upload your resume before applying for a job.
+  //           <Button asChild>
+  //             <Link href="/user-settings/resume">Upload Resume</Link>
+  //           </Button>
+  //         </PopoverContent>
+  //       </Popover>
+  //     );
+  //   }
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Apply</Button>
+      </DialogTrigger>
+      <DialogContent className="md:max-w-3xl mx-h[calc(100%-2rem)] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle>Application</DialogTitle>
+          <DialogDescription>
+            Applying for a job cannot be undone once submitted. Also you only
+            can apply once per job listing.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex-1 overflow-y-auto">
+          <NewJobListingApplicationForm jobListingId={jobListingId} />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 async function getJobListing(jobListingId: string) {

@@ -1,5 +1,4 @@
 import { getGlobalTag, getIdTag, getOrganizationTag } from "@/lib/dataCache";
-import { profile } from "console";
 import { revalidateTag } from "next/cache";
 
 export function getJobListingsGlobalTag() {
