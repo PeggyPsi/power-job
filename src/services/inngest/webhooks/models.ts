@@ -6,3 +6,7 @@ export interface JobListingApplicationJSON {
 	jobListingId: string;
 	userId: string;
 }
+
+export interface UserResumeUploadedJSON {
+	userId: string;
+}

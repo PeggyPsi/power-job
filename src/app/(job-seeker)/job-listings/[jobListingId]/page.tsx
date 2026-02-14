@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/dialog";
 import { NewJobListingApplicationForm } from "@/features/jobListingApplications/components/NewJobListingApplicationForm";
 import { getJobListingApplication } from "@/features/jobListingApplications/actions/actions";
-import { getUserResume } from "@/features/usersResumes/actions/actions";
+import { getUserResume } from "@/features/userResumes/actions/actions";
 
 type Props = {
   params: Promise<{ jobListingId: string }>;

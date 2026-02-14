@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@import "uploadthing/tw/v4";
+@source "../../node_modules/@uploadthing/react/dist";
+
 /**
 DEV NOTE: Create a dark: variant that applies utilities only when the user prefers dark mode, without needing a .dark class on <html>.
 For example we can use this like <div class="dark:bg-black"> in the HTML

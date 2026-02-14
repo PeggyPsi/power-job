@@ -9,7 +9,7 @@ import { getJobListingApplicationIdTag } from "../db/cache/jobListingApplication
 import { db } from "@/drizzle/db";
 import { and, eq } from "drizzle-orm";
 import { JobListingApplicationTable } from "@/drizzle/schema";
-import { getUserResume } from "@/features/usersResumes/actions/actions";
+import { getUserResume } from "@/features/userResumes/actions/actions";
 import { getPublishedJobListing } from "@/features/jobListings/actions/actions";
 import { inngest } from "@/services/inngest/client";
 
