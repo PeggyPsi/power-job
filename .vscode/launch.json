@@ -2,28 +2,39 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Next.js Debug (Server)",
-			"type": "pwa-node",
+			"name": "Next.js: launch with debugger",
+			"type": "node",
 			"request": "launch",
 			"program": "${workspaceFolder}/node_modules/next/dist/bin/next",
-			"args": [
-				"dev"
-			],
+			"args": ["dev"],
 			"cwd": "${workspaceFolder}",
-			"runtimeArgs": [
-				"--inspect=9229"
-			], // just standard inspect
-			"console": "integratedTerminal",
-			"internalConsoleOptions": "neverOpen"
+			"console": "internalConsole",
+			"internalConsoleOptions": "openOnSessionStart",
+			"skipFiles": ["<node_internals>/**"],
+			"outFiles": ["${workspaceFolder}/.next/**/*.js"],
+			"sourceMapPathOverrides": {
+				"webpack://_N_E/*": "${workspaceFolder}/*"
+			},
 		},
 		{
-			"name": "Attach to Next.js",
-			"type": "pwa-node",
+			"name": "Next.js: attach to running process",
+			"type": "node",
 			"request": "attach",
 			"port": 9229,
 			"restart": true,
-			"skipFiles": [
-				"<node_internals>/**"
+			"skipFiles": ["<node_internals>/**"],
+			"outFiles": [
+				"${workspaceFolder}/.next/**/*.js",
+				"!${workspaceFolder}/.next/cache/**"
+			],
+			"sourceMapPathOverrides": {
+				"webpack://_N_E/*": "${workspaceFolder}/*",
+				"webpack:///*": "${workspaceFolder}/*",
+				"webpack:///./src/*": "${workspaceFolder}/src/*"
+			},
+			"resolveSourceMapLocations": [
+				"${workspaceFolder}/**",
+				"!**/node_modules/**"
 			]
 		}
 	]

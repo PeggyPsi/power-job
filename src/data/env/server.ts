@@ -12,7 +12,9 @@ export const env = createEnv({
 		CLERK_SECRET_KEY: z.string().min(1),
 		CLERK_WEBHOOK_SECRET: z.string().min(1),
 		// ----- uploadthing -----
-		UPLOADTHING_TOKEN: z.string().min(1)
+		UPLOADTHING_TOKEN: z.string().min(1),
+		// ----- AI -----
+		ANTHROPIC_API_KEY: z.string().min(1)
 	},
 	createFinalSchema: env => {
 		return z.object(env).transform(val => {

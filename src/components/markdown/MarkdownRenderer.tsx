@@ -3,7 +3,7 @@ import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 
 export const markdownClassNames =
-  "max-w-none prose prose-neutral dark:prose-invert font-sans";
+  "mdxrenderer max-w-none prose prose-neutral dark:prose-invert font-sans";
 
 export function MarkdownRenderer({
   className,

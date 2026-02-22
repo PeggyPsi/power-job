@@ -46,7 +46,7 @@ async function SuspendedPage({ params }: IProps) {
             {jobListing.title}
           </h1>
           <div className="flex flex-wrap gap-2 mt-2">
-            <JobListingBadges jobsListing={jobListing} />
+            <JobListingBadges jobListing={jobListing} />
           </div>
         </div>
         <div className="flex items-center gap-2 empty:-mt-4">

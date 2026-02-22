@@ -40,7 +40,7 @@ export function MarkdownPartial({
         if (markdownRef.current == null) return;
         checkOverflow(markdownRef.current);
       },
-      { signal: controller.signal }
+      { signal: controller.signal },
     );
 
     return () => {

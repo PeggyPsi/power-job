@@ -28,7 +28,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { SignUpButton } from "@/services/clerk/components/AuthButtons";
+import {
+  SignInButton,
+  SignUpButton,
+} from "@/services/clerk/components/AuthButtons";
 import { connection } from "next/server";
 import { differenceInDays } from "date-fns";
 import {
@@ -182,7 +185,10 @@ async function ApplyButton({ jobListingId }: { jobListingId: string }) {
         </PopoverTrigger>
         <PopoverContent className="flex flex-col gap-2">
           You need to login in or create an account before applying for a job.
-          <SignUpButton />
+          <div className="flex gap-2 justify-center">
+            <SignInButton />
+            <SignUpButton />
+          </div>
         </PopoverContent>
       </Popover>
     );

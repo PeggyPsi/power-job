@@ -49,8 +49,8 @@ export const powerJobFileRouter = {
 				await uploadthing.deleteFiles(oldResumeFileKey);
 			}
 
-			// TODO: AI Generation
-			// await inngest.send({ name: "app/resume.uploaded", data: { userId } });
+			// AI Generation
+			await inngest.send({ name: "app/resume.uploaded", data: { userId } });
 
 			// !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
 			return { message: "Resume uploaded successfully" };
