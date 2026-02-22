@@ -1,3 +1,7 @@
+# Power Job App
+
+A full-stack job application tracker built with Next.js, helping users manage their job search by organizing listings, tracking applications, and leveraging AI-powered resume insights.
+
 ## Getting Started
 
 ```bash
