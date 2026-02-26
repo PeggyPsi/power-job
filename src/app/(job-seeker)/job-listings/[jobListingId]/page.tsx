@@ -142,14 +142,14 @@ async function JobListingDetails({ params, searchParams }: Props) {
             </div>
             {jobListing.postedAt != null && (
               <div className="text-sm text-muted-foreground @min-lg:hidden">
-                {jobListing.postedAt.toLocaleDateString()}
+                {jobListing.postedAt.toLocaleDateString("en-GB")}
               </div>
             )}
           </div>
           <div className="ml-auto flex items-center gap-4">
             {jobListing.postedAt != null && (
               <div className="text-sm text-muted-foreground @max-lg:hidden">
-                {jobListing.postedAt.toLocaleDateString()}
+                {jobListing.postedAt.toLocaleDateString("en-GB")}
               </div>
             )}
             <Button size="icon" variant="outline" asChild>

@@ -127,7 +127,10 @@ function JobListingsListItem({
             </CardDescription>
             {jobListing.postedAt != null && (
               <div className="text-sm font-medium text-primary @min-md:hidden">
-                <Suspense fallback={jobListing.postedAt.toLocaleDateString()}>
+                {/* TODO: create an override of toLocaleDateString to support localization based on user preference */}
+                <Suspense
+                  fallback={jobListing.postedAt.toLocaleDateString("en-GB")}
+                >
                   <DaysSincePosted postedAt={jobListing.postedAt} />
                 </Suspense>
               </div>
@@ -136,7 +139,9 @@ function JobListingsListItem({
           {/* Render for smaller screens */}
           {jobListing.postedAt != null && (
             <div className="text-sm font-medium text-primary ml-auto @max-md:hidden">
-              <Suspense fallback={jobListing.postedAt.toLocaleDateString()}>
+              <Suspense
+                fallback={jobListing.postedAt.toLocaleDateString("en-GB")}
+              >
                 <DaysSincePosted postedAt={jobListing.postedAt} />
               </Suspense>
             </div>

@@ -6,6 +6,7 @@ A full-stack job application tracker built with Next.js, helping users manage th
 
 ```bash
 docker-compose up # to run all the appropriate containers related to the application
+#(or `docker compose up` for linux/ubuntu)
 npm run dev
 ```
 
@@ -16,7 +17,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 To initialize the database you need to create and run a migration file of the DB schema.
 Run the following commands to generate it and apply it.
 
-!IMPORTANT: make sure that postgresql is up and running. You have to run `docker-compose up` to run it
+!IMPORTANT: make sure that postgresql is up and running. You have to run `docker-compose up` (or `docker compose up` for linux/ubuntu) to run it
 
 ```bash
 # make sure to run the following commands from the root folder
@@ -28,7 +29,7 @@ npm run db:studio # (optional) open drizzle studio in a UI interface to checkout
 
 # Styling
 
-The project uses [shadcn](https://ui.shadcn.com/docs/components/sidebar) library for the components and the whole styling.
+The project uses [shadcn](https://ui.shadcn.com) library for the components and the whole styling.
 
 # Authentication
 
