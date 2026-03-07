@@ -75,14 +75,14 @@ function JobListingMenuItem({
 }) {
   const { jobListingId } = useParams();
   return (
-    <SidebarMenuSubItem>
+    <SidebarMenuSubItem className="block relative">
       <SidebarMenuSubButton isActive={jobListingId === jobListing.id} asChild>
         <Link href={`/employer/job-listings/${jobListing.id}`}>
           <span className="truncate">{jobListing.title}</span>
         </Link>
       </SidebarMenuSubButton>
       {jobListing.applicationCount > 0 && (
-        <div className="absolute right-2 top-1/2 -stranslate-y-1/2 text-sm text-muted-foreground">
+        <div className="absolute top-1 right-2 text-sm text-muted-foreground">
           {jobListing.applicationCount}
         </div>
       )}

@@ -5,7 +5,7 @@ A full-stack job application tracker built with Next.js, helping users manage th
 ## Getting Started
 
 ```bash
-docker-compose up # to run all the appropriate containers related to the application
+docker compose up # to run all the appropriate containers related to the application
 #(or `docker compose up` for linux/ubuntu)
 npm run dev
 ```

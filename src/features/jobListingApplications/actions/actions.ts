@@ -46,13 +46,12 @@ export async function createJobListingApplication(jobListingId: string, unsafeDa
 	}
 
 	// Check if the user has a resume before allowing them to apply for the job
-	// TODO: to uncomment - this is temporary
-	// if (userResume == null) {
-	// 	return {
-	// 		error: true,
-	// 		message: "You must have a resume to apply for a job.",
-	// 	};
-	// }
+	if (userResume == null) {
+		return {
+			error: true,
+			message: "You must have a resume to apply for a job.",
+		};
+	}
 
 	// We try and make sure that the data are valid before proceeding
 	const { success, data } = newJobListingApplicationsSchema.safeParse(unsafeData);
@@ -69,14 +68,14 @@ export async function createJobListingApplication(jobListingId: string, unsafeDa
 		userId: userId
 	});
 
-	// TODO: AI generation
-	// await inngest.send({
-	// 	name: "app/jobListingApplication.created",
-	// 	data: {
-	// 		jobListingId,
-	// 		userId,
-	// 	}
-	// })
+	// AI generation
+	await inngest.send({
+		name: "app/jobListingApplication.created",
+		data: {
+			jobListingId,
+			userId,
+		}
+	})
 
 	return { error: false, message: "Your application has been submitted successfully" };
 }

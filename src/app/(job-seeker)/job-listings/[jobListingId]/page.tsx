@@ -72,7 +72,7 @@ export default async function JobListingPage({ params, searchParams }: Props) {
           breakPoint="min-width: 1024px"
           otherwise={
             <ClientSheet>
-              <SheetContent hideCloseButton className="p-4">
+              <SheetContent hideCloseButton className="p-4 overflow-y-auto">
                 {/* sr-only : screen reader only -> so that screen reader users can be informed that this is a job listing details sheet */}
                 <SheetHeader className="sr-only">
                   <SheetTitle></SheetTitle>

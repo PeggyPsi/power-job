@@ -157,17 +157,17 @@ export async function deleteJobListing(id: string) {
 
 	await jobListingsRepository.delete(id, orgId);
 
-	redirect("/employer");
+	return { error: false, redirectTo: "/employer" };
 }
 
-export async function getJobListing(id: string, orgId: string) {
+export async function getJobListing(id: string, orgId?: string) {
 	"use cache"
 	cacheTag(getJobListingIdTag(id))
 
 	return db.query.JobListingTable.findFirst({
 		where: and(
 			eq(JobListingTable.id, id),
-			eq(JobListingTable.organizationId, orgId)
+			orgId ? eq(JobListingTable.organizationId, orgId) : undefined
 		),
 	})
 }

@@ -1,6 +1,7 @@
 import { db } from "@/drizzle/db";
 import { JobListingApplicationTable } from "@/drizzle/schema";
 import { revalidateJobListingApplicationsCache } from "./cache/jobListingApplications";
+import { and, eq } from "drizzle-orm";
 
 export const jobListingApplicationsRepository = {
 	create: async (jobListingApplication: typeof JobListingApplicationTable.$inferInsert) => {
@@ -11,5 +12,16 @@ export const jobListingApplicationsRepository = {
 			.values(jobListingApplication);
 
 		revalidateJobListingApplicationsCache(jobListingApplication); // always revalidate cache after CRUD operations
-	}
+	},
+	update: async ({ jobListingId, userId }: { jobListingId: string, userId: string }, data: Partial<typeof JobListingApplicationTable.$inferInsert>) => {
+		await db
+			.update(JobListingApplicationTable)
+			.set(data)
+			.where(and(
+				eq(JobListingApplicationTable.jobListingId, jobListingId),
+				eq(JobListingApplicationTable.userId, userId)
+			));
+
+		revalidateJobListingApplicationsCache({ jobListingId, userId }); // always revalidate cache after CRUD operations
+	},
 }

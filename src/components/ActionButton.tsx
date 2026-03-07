@@ -4,6 +4,7 @@ import { ComponentPropsWithRef, useTransition } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import LoadingSwap from "./LoadingSwap";
+import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,17 +23,20 @@ export function ActionButton({
   areYouSureDescription = "Are you sure?",
   ...props
 }: Omit<ComponentPropsWithRef<typeof Button>, "onClick"> & {
-  action: () => Promise<{ error: boolean; message?: string }>;
+  action: () => Promise<{ error: boolean; message?: string; redirectTo?: string }>;
   requireAreYouSure?: boolean;
   areYouSureDescription?: string;
 }) {
   const [isLoading, startTransition] = useTransition();
+  const router = useRouter();
 
   function performAction() {
     startTransition(async () => {
       const result = await action();
       if (result.error) {
         toast.error(result.message || "An error occurred.");
+      } else if (result.redirectTo) {
+        router.push(result.redirectTo);
       }
     });
   }
