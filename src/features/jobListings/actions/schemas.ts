@@ -1,4 +1,5 @@
 import { experienceLevels, /*jobListingStatuses,*/ jobListingTypes, locationRequirements, wageIntervals } from "@/drizzle/schema";
+import { Qahiri } from "next/font/google";
 import z from "zod";
 
 export const jobListingsSchema = z.object({
@@ -29,3 +30,7 @@ export const jobListingsSchema = z.object({
 	message: "StateAbbreviation must be provided for in-office or hybrid job listings",
 	path: ["stateAbbreviation"]
 });
+
+export const jobListingAiSearchSchema = z.object({
+	query: z.string().min(1, "Required"),
+})

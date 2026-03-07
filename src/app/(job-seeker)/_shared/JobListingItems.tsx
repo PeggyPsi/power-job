@@ -251,9 +251,17 @@ function getWhereConditionsBySearchParams(
   }
 
   if (searchParams.jobIds) {
-    whereConditions.push(
-      or(...searchParams.jobIds.map((jobId) => eq(JobListingTable.id, jobId))),
-    );
+    console.debug(searchParams.jobIds);
+    if (typeof searchParams.jobIds === "string") {
+      const jobId = searchParams.jobIds;
+      whereConditions.push(eq(JobListingTable.id, jobId));
+    } else {
+      whereConditions.push(
+        or(
+          ...searchParams.jobIds.map((jobId) => eq(JobListingTable.id, jobId)),
+        ),
+      );
+    }
   }
 
   return whereConditions;

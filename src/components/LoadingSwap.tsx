@@ -16,15 +16,15 @@ export default function LoadingSwap({
         className={cn(
           "row-start-1 row-end-1 col-start-1 col-end-1",
           isLoading ? "invisible" : "visible",
-          className
+          className,
         )}
       >
         {children}
       </div>
       <div
         className={cn(
-          "row-start-1 row-end-1 col-start-1 col-end-1",
-          isLoading ? "visible" : "invisible"
+          "row-start-1 row-end-2 col-start-1 col-end-2 place-self-center",
+          isLoading ? "visible" : "invisible",
         )}
       >
         <Loader2Icon className="animate-spin" />
