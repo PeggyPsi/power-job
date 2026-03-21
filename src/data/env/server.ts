@@ -14,7 +14,11 @@ export const env = createEnv({
 		// ----- uploadthing -----
 		UPLOADTHING_TOKEN: z.string().min(1),
 		// ----- AI -----
-		ANTHROPIC_API_KEY: z.string().min(1)
+		ANTHROPIC_API_KEY: z.string().min(1),
+		// ----- RESEND -----
+		RESEND_API_KEY: z.string().min(1),
+		// ----- OTHER -----
+		SERVER_URL: z.string().min(1)
 	},
 	createFinalSchema: env => {
 		return z.object(env).transform(val => {

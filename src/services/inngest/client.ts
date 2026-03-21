@@ -1,6 +1,7 @@
+import { JobListingTable } from "@/drizzle/schema";
 import { DeletedObjectJSON, OrganizationJSON, UserJSON } from "@clerk/nextjs/server";
 import { EventSchemas, Inngest } from "inngest";
-import { AppWebhookData, JobListingApplicationJSON, UserResumeUploadedJSON } from "./webhooks/models";
+// import { AppWebhookData, JobListingApplicationJSON, UserResumeUploadedJSON } from "./webhooks/models";
 
 // The type of data sent by Clerk webhooks
 // T corrensponds to the specific Clerk object being sent
@@ -23,8 +24,33 @@ type Events = {
 	"clerk/organization.deleted": ClerkWebhookData<DeletedObjectJSON>,
 
 	// Custom app webhooks
-	"app/jobListingApplication.created": AppWebhookData<JobListingApplicationJSON>,
-	"app/resume.uploaded": AppWebhookData<UserResumeUploadedJSON>
+	// "app/jobListingApplication.created": AppWebhookData<JobListingApplicationJSON>,
+	// "app/resume.uploaded": AppWebhookData<UserResumeUploadedJSON>
+	// "app/email.daily-user-job-listings": AppWebhookData<UserResumeUploadedJSON>
+	"app/jobListingApplication.created": {
+		data: {
+			jobListingId: string
+			userId: string
+		}
+	}
+	"app/resume.uploaded": {
+		user: {
+			id: string
+		}
+	}
+	"app/email.daily-user-job-listings": {
+		data: {
+			aiPrompt?: string
+			jobListings: (Omit<
+				typeof JobListingTable.$inferSelect,
+				"createdAt" | "postedAt" | "updatedAt" | "status" | "organizationId"
+			> & { organizationName: string })[]
+		}
+		user: {
+			email: string
+			name: string
+		}
+	},
 }
 
 // Create a client to send and receive events
