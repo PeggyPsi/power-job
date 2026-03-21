@@ -3,6 +3,7 @@ import { NonRetriableError } from "inngest";
 import { userRepository } from "@/features/users/db/users.repository";
 import { userNotificationSettingsRepository } from "@/features/users/db/userNotificationSettings.repository";
 import { organizationsRepository } from "@/features/organizations/db/organizations.repository";
+import { organizationUserSettingsRepository } from "@/features/organizations/db/organizationUserSettings.repository";
 
 // DEV: this method is causing me trouble when i use it inside inngest functions
 // Helper method to verify Clerk webhooks
@@ -118,7 +119,6 @@ export const clerkCreateOrganization = inngest.createFunction({
 	}
 );
 
-// Organizations
 export const clerkUpdateOrganization = inngest.createFunction({
 	id: "clerk/update-organization",
 	name: "Clerk - Update DB Organization"
@@ -157,6 +157,49 @@ export const clerkDeleteOrganization = inngest.createFunction({
 				throw new NonRetriableError("No organization id found to delete");
 			}
 			await organizationsRepository.delete(organizationIdToDelete);
+		})
+	}
+);
+
+// Organization Memberships
+export const clerkCreateOrgMembership = inngest.createFunction({
+	id: "clerk/create-organization-user-settings",
+	name: "Clerk - Create Organization User Settings"
+},
+	{
+		event: 'clerk/organizationMembership.created'
+	},
+	async ({ event, step }) => {
+		// Create actual organization
+		await step.run("create-organization-user-settings", async () => {
+			const userId = event.data.data.public_user_data.user_id;
+			const orgId = event.data.data.organization.id;
+
+			await organizationUserSettingsRepository.insert({
+				userId: userId,
+				organizationId: orgId
+			})
+		})
+	}
+);
+
+export const clerkDeleteOrgMembership = inngest.createFunction({
+	id: "clerk/delete-organization-user-settings",
+	name: "Clerk - Delete Organization User Settings"
+},
+	{
+		event: 'clerk/organizationMembership.deleted'
+	},
+	async ({ event, step }) => {
+		// Create actual organization
+		await step.run("delete-organization-user-settings", async () => {
+			const userId = event.data.data.public_user_data.user_id;
+			const orgId = event.data.data.organization.id;
+
+			await organizationUserSettingsRepository.delete({
+				userId: userId,
+				organizationId: orgId
+			})
 		})
 	}
 );

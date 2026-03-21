@@ -1,6 +1,6 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/services/inngest/client";
-import { clerkCreateOrganization, clerkCreateUser, clerkDeleteOrganization, clerkDeleteUser, clerkUpdateOrganization, clerkUpdateUser } from "@/services/inngest/functions/clerk.inngest";
+import { clerkCreateOrganization, clerkCreateOrgMembership, clerkCreateUser, clerkDeleteOrganization, clerkDeleteOrgMembership, clerkDeleteUser, clerkUpdateOrganization, clerkUpdateUser } from "@/services/inngest/functions/clerk.inngest";
 import { createAISummaryOfUploadedResume } from "@/services/inngest/functions/resume.inngest";
 import { rankApplicant } from "@/services/inngest/functions/jobListingApplication.inngest";
 import { prepareDailyUserJobListingNotifications, sendDailyUserJobListingEmail } from "@/services/inngest/functions/email";
@@ -15,6 +15,8 @@ export const { GET, POST, PUT } = serve({
 		clerkCreateOrganization,
 		clerkUpdateOrganization,
 		clerkDeleteOrganization,
+		clerkCreateOrgMembership,
+		clerkDeleteOrgMembership,
 		// AI
 		createAISummaryOfUploadedResume,
 		rankApplicant,

@@ -123,6 +123,4 @@ export function NotificationsForm({
       </form>
     </Form>
   );
-
-  return null;
 }
