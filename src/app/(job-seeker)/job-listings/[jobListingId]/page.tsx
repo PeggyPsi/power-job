@@ -44,14 +44,13 @@ import {
 } from "@/components/ui/dialog";
 import { NewJobListingApplicationForm } from "@/features/jobListingApplications/components/NewJobListingApplicationForm";
 import { getJobListingApplication } from "@/features/jobListingApplications/actions/actions";
-import { getUserResume } from "@/features/userResumes/actions/actions";
 
 type Props = {
   params: Promise<{ jobListingId: string }>;
   searchParams: Promise<Record<string, string | string[]>>;
 };
 
-export default async function JobListingPage({ params, searchParams }: Props) {
+export default function JobListingPage({ params, searchParams }: Props) {
   return (
     <>
       <ResizablePanelGroup
