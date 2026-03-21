@@ -104,14 +104,16 @@ export default function OrgUserSettingsForm({
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue asChild>
-                          {field.value == null ? (
-                            <span>Any Rating</span>
-                          ) : (
-                            <RatingIcons
-                              className="text-inherit"
-                              rating={field.value}
-                            />
-                          )}
+                          <span className="pointer-events-none">
+                            {field.value == null ? (
+                              "Any Rating"
+                            ) : (
+                              <RatingIcons
+                                className="text-inherit"
+                                rating={field.value}
+                              />
+                            )}
+                          </span>
                         </SelectValue>
                       </SelectTrigger>
                     </FormControl>

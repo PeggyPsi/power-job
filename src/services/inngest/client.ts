@@ -1,4 +1,4 @@
-import { JobListingTable } from "@/drizzle/schema";
+import { JobListingApplicationTable, JobListingTable } from "@/drizzle/schema";
 import { DeletedObjectJSON, OrganizationJSON, OrganizationMembershipJSON, UserJSON } from "@clerk/nextjs/server";
 import { EventSchemas, Inngest } from "inngest";
 // import { AppWebhookData, JobListingApplicationJSON, UserResumeUploadedJSON } from "./webhooks/models";
@@ -54,6 +54,24 @@ type Events = {
 			name: string
 		}
 	},
+	"app/email.daily-organization-user-applications": {
+		data: {
+			applications: (Pick<
+				typeof JobListingApplicationTable.$inferSelect,
+				"rating"
+			> & {
+				userName: string
+				organizationId: string
+				organizationName: string
+				jobListingId: string
+				jobListingTitle: string
+			})[]
+		}
+		user: {
+			email: string
+			name: string
+		}
+	}
 }
 
 // Create a client to send and receive events

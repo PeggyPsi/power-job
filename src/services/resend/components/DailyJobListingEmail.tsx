@@ -18,7 +18,7 @@ import {
   formatLocationRequirement,
   formatWage,
 } from "@/features/jobListings/lib/formatters";
- 
+
 type JobListing = Pick<
   typeof JobListingTable.$inferSelect,
   | "id"
@@ -123,7 +123,7 @@ DailyJobListingEmail.PreviewProps = {
       experienceLevel: "senior",
       type: "part-time",
       id: randomUUID(),
-      organizationName: "Web Dev Simplified",
+      organizationName: "Arabasta",
       locationRequirement: "in-office",
     },
     {
