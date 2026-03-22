@@ -5,13 +5,15 @@ import { newJobListingApplicationsSchema } from "./schemas";
 import { jobListingApplicationsRepository } from "../db/jobListingApplications.repository";
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentAuth";
 import { cacheTag } from "next/cache";
-import { getJobListingApplicationIdTag } from "../db/cache/jobListingApplications";
+import { getJobListingApplicationIdTag, getJobListingApplicationJobListingTag } from "../db/cache/jobListingApplications";
 import { db } from "@/drizzle/db";
 import { and, eq } from "drizzle-orm";
 import { JobListingApplicationTable } from "@/drizzle/schema";
 import { getUserResume } from "@/features/userResumes/actions/actions";
 import { getPublishedJobListing } from "@/features/jobListings/actions/actions";
 import { inngest } from "@/services/inngest/client";
+import { getUserIdTag } from "@/features/users/db/cache/users";
+import { getUserResumeIdTag } from "@/features/userResumes/db/cache/userResumes";
 
 export async function createJobListingApplication(jobListingId: string, unsafeData: z.infer<typeof newJobListingApplicationsSchema>) {
 	// Check if the user is authenticated
@@ -96,4 +98,50 @@ export async function getJobListingApplication({
 			eq(JobListingApplicationTable.userId, userId),
 		),
 	});
+}
+
+export async function getJobListingApplications({
+	jobListingId
+}: {
+	jobListingId: string;
+}) {
+	"use cache";
+	cacheTag(getJobListingApplicationJobListingTag(jobListingId));
+
+	const data = await db.query.JobListingApplicationTable.findMany({
+		where: eq(JobListingApplicationTable.jobListingId, jobListingId),
+		columns: {
+			coverLetter: true,
+			createdAt: true,
+			stage: true,
+			rating: true,
+			jobListingId: true
+		},
+		with: {
+			user: {
+				columns: {
+					id: true,
+					name: true,
+					imageUrl: true
+				},
+				with: {
+					resume: {
+						columns: {
+							resumeFileUrl: true,
+							aiSummary: true
+						}
+					}
+				}
+			}
+		}
+	});
+
+	// cache the user and his resume in case the user has at any point changed anything on hid/her profile 
+	// as well as his/her resume
+	data.forEach(({ user }) => {
+		cacheTag(getUserIdTag(user.id));
+		cacheTag(getUserResumeIdTag(user.id))
+	});
+
+	return data;
 }

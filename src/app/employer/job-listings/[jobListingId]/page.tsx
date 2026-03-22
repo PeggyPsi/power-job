@@ -3,6 +3,12 @@ import { AsyncIf } from "@/components/AsyncIf";
 import { MarkdownPartial } from "@/components/markdown/MarkdownPartial";
 import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { getJobListingApplications } from "@/features/jobListingApplications/actions/actions";
+import {
+  ApplicationsTable,
+  SkeletonApplicationTable,
+} from "@/features/jobListingApplications/components/ApplicationsTable";
 import {
   deleteJobListing,
   getJobListing,
@@ -103,6 +109,31 @@ async function SuspendedPage({ params }: IProps) {
         dialogMarkdown={<MarkdownRenderer source={jobListing.description} />}
         dialogTitle={"Decription"}
       />
+
+      <Separator />
+
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold">Applications</h2>
+        <Suspense fallback={<SkeletonApplicationTable />}>
+          <Applications jobListingId={jobListingId} />
+        </Suspense>
+      </div>
     </div>
+  );
+}
+
+async function Applications({ jobListingId }: { jobListingId: string }) {
+  const applications = await getJobListingApplications({ jobListingId });
+
+  return (
+    <ApplicationsTable
+      applications={applications}
+      canUpdateRating={await hasOrgUserPermission(
+        ClerkConfiguration.UserPermissions.JobListingApplications.ChangeRating,
+      )}
+      canUpdateStage={await hasOrgUserPermission(
+        ClerkConfiguration.UserPermissions.JobListingApplications.ChangeState,
+      )}
+    />
   );
 }

@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
+import { getInitialsFromWords } from "@/lib/utils";
 import { SignOutButton, useClerk } from "@clerk/nextjs";
 import {
   ChevronsUpDown,
@@ -30,7 +31,7 @@ interface ISidebarUserInfo {
 }
 
 export default function SidebarUserButtonClient(
-  props: ISidebarUserButtonClientProps
+  props: ISidebarUserButtonClientProps,
 ) {
   const { isMobile, setOpenMobile } = useSidebar();
   const { openUserProfile } = useClerk();
@@ -85,14 +86,11 @@ export default function SidebarUserButtonClient(
 // Render the actual user info in the meun button
 function UserInfo(user: ISidebarUserInfo) {
   // Get the initials from the user's name. For example Peggy Psi => PP
-  const nameInitials = user.name
-    .split(" ")
-    .slice(0, 2)
-    .map((str) => str[0])
-    .join("");
+  const nameInitials = getInitialsFromWords(user?.name, 2);
 
   return (
     <div className="flex gap-2 items-center overflow-hidden">
+      {/* TODO: export Avatar renering to a different component it is shared many times */}
       <Avatar className="rounded-lg size-8">
         <AvatarImage src={user.imageUrl} alt="name" />
         <AvatarFallback className="uppercase bg-primary text-primary-foreground">
