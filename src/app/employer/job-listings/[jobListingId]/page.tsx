@@ -127,12 +127,28 @@ async function Applications({ jobListingId }: { jobListingId: string }) {
 
   return (
     <ApplicationsTable
-      applications={applications}
+      applications={applications.map((a) => ({
+        ...a,
+        user: {
+          ...a.user,
+          resume: a.user.resume
+            ? {
+                ...a.user.resume,
+                markDownSummary: a.user.resume.aiSummary ? (
+                  <MarkdownRenderer source={a.user.resume.aiSummary} />
+                ) : null,
+              }
+            : null,
+        },
+        converLetterMarkdown: a.coverLetter ? (
+          <MarkdownRenderer source={a.coverLetter} />
+        ) : null,
+      }))}
       canUpdateRating={await hasOrgUserPermission(
         ClerkConfiguration.UserPermissions.JobListingApplications.ChangeRating,
       )}
       canUpdateStage={await hasOrgUserPermission(
-        ClerkConfiguration.UserPermissions.JobListingApplications.ChangeState,
+        ClerkConfiguration.UserPermissions.JobListingApplications.ChangeStage,
       )}
     />
   );

@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { NewJobListingApplicationForm } from "@/features/jobListingApplications/components/NewJobListingApplicationForm";
 import { getJobListingApplication } from "@/features/jobListingApplications/actions/actions";
+import { getUserResume } from "@/features/userResumes/actions/actions";
 
 type Props = {
   params: Promise<{ jobListingId: string }>;
@@ -213,25 +214,25 @@ async function ApplyButton({ jobListingId }: { jobListingId: string }) {
     );
   }
 
-  // TODO: to uncomment - this is temporary
+  // DEVNOTE: if ever needed to debug just comment it so that it does not check is user has resume
   // If the user has not applied, show the apply button. But first check if they have a resume uploaded,
   // if not show a popover prompting them to upload a resume before applying.
-  //   const userResume = await getUserResume(userId);
-  //   if (userResume == null) {
-  //     return (
-  //       <Popover>
-  //         <PopoverTrigger asChild>
-  //           <Button>Apply</Button>
-  //         </PopoverTrigger>
-  //         <PopoverContent className="flex flex-col gap-2">
-  //           You need to upload your resume before applying for a job.
-  //           <Button asChild>
-  //             <Link href="/user-settings/resume">Upload Resume</Link>
-  //           </Button>
-  //         </PopoverContent>
-  //       </Popover>
-  //     );
-  //   }
+  const userResume = await getUserResume(userId);
+  if (userResume == null) {
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button>Apply</Button>
+        </PopoverTrigger>
+        <PopoverContent className="flex flex-col gap-2">
+          You need to upload your resume before applying for a job.
+          <Button asChild>
+            <Link href="/user-settings/resume">Upload Resume</Link>
+          </Button>
+        </PopoverContent>
+      </Popover>
+    );
+  }
 
   return (
     <Dialog>

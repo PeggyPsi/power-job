@@ -9,7 +9,7 @@ export const ClerkConfiguration = {
 		},
 		JobListingApplications: {
 			ChangeRating: 'org:job_listing_applications:change_rating',
-			ChangeState: 'org:job_listing_applications:change_stage'
+			ChangeStage: 'org:job_listing_applications:change_stage'
 		}
 	},
 	// Based on the features used in the clerk subsiptions plans configuration

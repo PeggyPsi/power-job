@@ -3,17 +3,19 @@
 import z from "zod";
 import { newJobListingApplicationsSchema } from "./schemas";
 import { jobListingApplicationsRepository } from "../db/jobListingApplications.repository";
-import { getCurrentUser } from "@/services/clerk/lib/getCurrentAuth";
+import { getCurrentOrganization, getCurrentUser } from "@/services/clerk/lib/getCurrentAuth";
 import { cacheTag } from "next/cache";
 import { getJobListingApplicationIdTag, getJobListingApplicationJobListingTag } from "../db/cache/jobListingApplications";
 import { db } from "@/drizzle/db";
 import { and, eq } from "drizzle-orm";
-import { JobListingApplicationTable } from "@/drizzle/schema";
+import { ApplicationStage, applicationStageEnum, applicationStages, JobListingApplicationTable } from "@/drizzle/schema";
 import { getUserResume } from "@/features/userResumes/actions/actions";
-import { getPublishedJobListing } from "@/features/jobListings/actions/actions";
+import { getJobListing, getPublishedJobListing } from "@/features/jobListings/actions/actions";
 import { inngest } from "@/services/inngest/client";
 import { getUserIdTag } from "@/features/users/db/cache/users";
 import { getUserResumeIdTag } from "@/features/userResumes/db/cache/userResumes";
+import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
+import { ClerkConfiguration } from "@/services/clerk/lib/ClerkConfiguration";
 
 export async function createJobListingApplication(jobListingId: string, unsafeData: z.infer<typeof newJobListingApplicationsSchema>) {
 	// Check if the user is authenticated
@@ -144,4 +146,60 @@ export async function getJobListingApplications({
 	});
 
 	return data;
+}
+
+export async function updateJobListingApplicationStage({ jobListingId, userId }: { jobListingId: string, userId: string }, unsafeStage: ApplicationStage) {
+	const { orgId } = await getCurrentOrganization();
+	const hasPermission = await hasOrgUserPermission(ClerkConfiguration.UserPermissions.JobListingApplications.ChangeStage);
+	if (orgId == null || !hasPermission) return {
+		error: true,
+		message: "You dont have permissions to change the stage of the application"
+	}
+
+	// We try and make sure that the data are valid before proceeding
+	const { success, data: stage } = z.enum(applicationStages).safeParse(unsafeStage);
+	if (!success) {
+		return {
+			error: true,
+			message: "The provided data is invalid.",
+		}
+	}
+
+	const joblisting = await getPublishedJobListing(jobListingId);
+	if (!joblisting) return {
+		error: true,
+		message: "You dont have permissions to change the stage of the application"
+	}
+
+	await jobListingApplicationsRepository.update({ jobListingId, userId }, { stage });
+
+	return { error: false }
+}
+
+export async function updateJobListingApplicationRating({ jobListingId, userId }: { jobListingId: string, userId: string }, unsafeRating: number | null) {
+	const { orgId } = await getCurrentOrganization();
+	const hasPermission = await hasOrgUserPermission(ClerkConfiguration.UserPermissions.JobListingApplications.ChangeRating);
+	if (orgId == null || !hasPermission) return {
+		error: true,
+		message: "You dont have permissions to change the rating of the application"
+	}
+
+	// We try and make sure that the data are valid before proceeding
+	const { success, data: rating } = z.number().min(1).max(5).safeParse(unsafeRating);
+	if (!success) {
+		return {
+			error: true,
+			message: "The provided data is invalid.",
+		}
+	}
+
+	const joblisting = await getPublishedJobListing(jobListingId);
+	if (!joblisting) return {
+		error: true,
+		message: "You dont have permissions to change the rating of the application"
+	}
+
+	await jobListingApplicationsRepository.update({ jobListingId, userId }, { rating });
+
+	return { error: false }
 }

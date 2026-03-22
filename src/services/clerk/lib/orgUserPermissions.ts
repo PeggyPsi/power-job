@@ -8,7 +8,7 @@ type UserPermission =
 	| typeof ClerkConfiguration.UserPermissions.JobListings.Update
 	| typeof ClerkConfiguration.UserPermissions.JobListings.ChangeStatus
 	| typeof ClerkConfiguration.UserPermissions.JobListingApplications.ChangeRating
-	| typeof ClerkConfiguration.UserPermissions.JobListingApplications.ChangeState
+	| typeof ClerkConfiguration.UserPermissions.JobListingApplications.ChangeStage
 
 export async function hasOrgUserPermission(permission: UserPermission) {
 	const { has } = await auth();
