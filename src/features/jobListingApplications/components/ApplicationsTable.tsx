@@ -11,7 +11,7 @@ import {
   UserTable,
 } from "@/drizzle/schema";
 import { cn, getInitialsFromWords } from "@/lib/utils";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Table } from "@tanstack/react-table";
 import { ReactNode, useOptimistic, useState, useTransition } from "react";
 import { sortApplicationsByStage } from "../lib/utils";
 import { formatJobListingApplicationStage } from "../lib/formatters";
@@ -40,6 +40,8 @@ import { RatingIcons } from "./RatingIcons";
 import { RATING_OPTIONS } from "../data/constants";
 import { DialogHeader } from "@/components/ui/dialog";
 import Link from "next/link";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { DataTableFacetedFilter } from "@/components/dataTable/DataTableFacetedFilter";
 
 // We pass down converLetter and resume Ai Summary as markdowns is because the markdown render that
 // we use so far only works on the server and here we have a client component. That's why we have to pass down these
@@ -294,7 +296,7 @@ function ActionCell({
     null,
   );
 
-  console.log("------------" + resumeUrl);
+  //   console.log("------------" + resumeUrl);
 
   return (
     <>
@@ -374,8 +376,65 @@ function ActionCell({
 
 /** Fallback skeleton whiule we wait for the data table to fullly render with data */
 export function SkeletonApplicationTable() {
-  // TODO: implement SkeletonApplicationTable
-  return null;
+  return (
+    <ApplicationsTable
+      applications={[]}
+      canUpdateRating={false}
+      canUpdateStage={false}
+      disableToolbar
+      noResultsMessage={<LoadingSpinner className="size-12" />}
+    />
+  );
+}
+
+function Toolbar<T>({
+  table,
+  disabled,
+}: {
+  table: Table<T>;
+  disabled?: boolean;
+}) {
+  const hiddenRows = table.getCoreRowModel().rows.length - table.getRowCount();
+
+  return (
+    <div className="flex items-center gap-2">
+      {table.getColumn("stage") && (
+        <DataTableFacetedFilter
+          disabled={disabled}
+          column={table.getColumn("stage")}
+          title="Stage"
+          options={applicationStages
+            .toSorted(sortApplicationsByStage)
+            .map((stage) => ({
+              label: <StageDetails stage={stage} />,
+              value: stage,
+              key: stage,
+            }))}
+        />
+      )}
+      {table.getColumn("rating") && (
+        <DataTableFacetedFilter
+          disabled={disabled}
+          column={table.getColumn("rating")}
+          title="Rating"
+          options={RATING_OPTIONS.map((rating, i) => ({
+            label: <RatingIcons rating={rating} />,
+            value: rating,
+            key: i,
+          }))}
+        />
+      )}
+      {hiddenRows > 0 && (
+        <div className="text-sm text-muted-foreground ml-2">
+          {hiddenRows} {hiddenRows > 1 ? "rows" : "row"} hidden
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DisabledToolbar<T>({ table }: { table: Table<T> }) {
+  return <Toolbar table={table} disabled />;
 }
 
 /** Actual component that renders the data table for the job lsiting applications */
@@ -383,15 +442,21 @@ export function ApplicationsTable({
   applications,
   canUpdateRating,
   canUpdateStage,
+  noResultsMessage = "No applications",
+  disableToolbar = false,
 }: {
   applications: Application[];
   canUpdateRating: boolean;
   canUpdateStage: boolean;
+  noResultsMessage?: ReactNode;
+  disableToolbar?: boolean;
 }) {
   return (
     <DataTable
       data={applications}
       columns={getColumns(canUpdateRating, canUpdateStage)}
+      noResultsMessage={noResultsMessage}
+      ToolbarComponent={disableToolbar ? DisabledToolbar : Toolbar}
     />
   );
 }
