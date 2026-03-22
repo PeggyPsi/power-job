@@ -457,6 +457,13 @@ export function ApplicationsTable({
       columns={getColumns(canUpdateRating, canUpdateStage)}
       noResultsMessage={noResultsMessage}
       ToolbarComponent={disableToolbar ? DisabledToolbar : Toolbar}
+      // by default filter out the already denied appications
+      initialFilters={[
+        {
+          id: "stage",
+          value: applicationStages.filter((stage) => stage !== "denied"),
+        },
+      ]}
     />
   );
 }

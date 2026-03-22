@@ -11,6 +11,7 @@ const isPublicRoute = createRouteMatcher([
 	"/forgot-password(.*)", // Forgot password page
 	"/api/(.*)", // API routes
 	"/job-listings(.*)", // Job listings page and details
+	"/ai-search" // must be publicly available to incentivize people to want to create account in the app
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
